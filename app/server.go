@@ -7,11 +7,12 @@ import (
 
 func StartServer(port string) {
 
-	http.Handle("/forum/", http.StripPrefix("/forum", http.FileServer(http.Dir("./game"))))
-	http.HandleFunc("/", ServerHandle)
-
 	log.Printf("Starting server at port " + port + "\n\n")
 	log.Printf("http://localhost:" + port + "/\n")
+
+	http.Handle("/web/", http.StripPrefix("/web", http.FileServer(http.Dir("./web"))))
+	http.HandleFunc("/", ServerHandle)
+
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }
 

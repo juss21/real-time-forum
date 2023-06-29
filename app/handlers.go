@@ -7,10 +7,10 @@ import (
 )
 
 func createAndExecute(w http.ResponseWriter) {
-	page, err := template.New("index.html").ParseFiles("web/templates/index.html", fmt.Sprint("web/templates/", "index.html"))
+	page, err := template.New("index.html").ParseFiles("web/templates/index.html")
 	if err != nil {
-		fmt.Println(err.Error())
 		createAndExecuteError(w, "500 Internal Server Error")
+		fmt.Println(err.Error())
 		return
 	}
 	err = page.Execute(w, PageData)
@@ -22,7 +22,7 @@ func createAndExecute(w http.ResponseWriter) {
 }
 
 func createAndExecuteError(w http.ResponseWriter, msg string) {
-	page, _ := template.New("index.html").ParseFiles("web/templates/index.html", fmt.Sprint("web/templates/", "error.html"))
+	page, _ := template.New("index.html").ParseFiles("web/templates/index.html")
 	PageData.ErrorMsg = msg
 	page.Execute(w, PageData)
 	PageData.ErrorMsg = ""
