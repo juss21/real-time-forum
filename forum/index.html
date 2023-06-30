@@ -1,0 +1,50 @@
+<html>
+
+<head>
+    <title>real-time-forum</title>
+    <link rel="shortcut icon" href="#">
+</head>
+
+
+<body>
+
+    <div id="welcomeForm">
+        <form id="welcome" action="javascript:client.getTest()">
+            <h1>TERE TULEMAST!</h1>
+            <input type="submit" class="button" value="Login">
+        </form>
+    </div>
+    
+    <div id="registerForm">
+        <form id="register" action="javascript:client.register()">
+            <input type="text" placeholder="Nickname" id="register_nickname">
+            <input type="text" placeholder="Age" id="register_age">
+            <input type="text" placeholder="Gender" id="register_gender">
+            <input type="text" placeholder="First Name" id="register_fname">
+            <input type="text" placeholder="Last Name" id="register_lname">
+            <input type="text" placeholder="E-mail" id="register_mail">
+            <input type="text" placeholder="Password" id="register_passwd">
+
+            <input type="submit" class="button" value="Register">
+        </form>
+
+    </div>
+
+
+    <div id="errorContainer"></div>
+
+
+<script src="websocket.js"></script>
+
+
+ 
+
+<script>
+    const client = new Client()
+    client.connect()
+</script>
+</body>
+
+
+
+</html>
