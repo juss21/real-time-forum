@@ -55,11 +55,11 @@ func wsReader(conn *websocket.Conn) {
 
 		switch jsonData["action"] {
 		case "getTest":
-			fmt.Println("Test!")
+			fmt.Println("sain nupp 1 kätte!")
 		case "katsetus":
-			fmt.Println("katsetus!")
+			fmt.Println("sain nupp 2 kätte!")
 		}
-		conn.WriteJSON(PageData)
 
+		conn.WriteJSON(PageData)
 	}
 }
