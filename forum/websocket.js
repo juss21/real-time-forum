@@ -50,11 +50,11 @@ class Client {
         Register()
     }
 
-    getTest() {
+    sendLogin() {
         let form = document.getElementById("welcome");
         let submitter = document.querySelector("button[value=Login]");
         let formData = new FormData(form, submitter);
-        let object = { action: "getTest" };
+        let object = { action: "login" };
         formData.forEach((value, key) => object[key] = value);
         var json = JSON.stringify(object);
         this.mysocket.send(json);
@@ -63,11 +63,11 @@ class Client {
         // this.mysocket.send(JSON.stringify( { action: "getTest"}))
     }
 
-    getTest2(){
+    sendRegister(){
         let form = document.getElementById("register");
         let submitter = document.querySelector("button[value=New]");
         let formData = new FormData(form, submitter);
-        let object = { action: "katsetus" };
+        let object = { action: "register" };
         formData.forEach((value, key) => object[key] = value);
         var json = JSON.stringify(object);
         this.mysocket.send(json);

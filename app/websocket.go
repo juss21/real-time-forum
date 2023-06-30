@@ -48,16 +48,18 @@ func wsReader(conn *websocket.Conn) {
 
 		var jsonData map[string]string // json string map
 		err = json.Unmarshal(message, &jsonData)
-		fmt.Println(err)
+
 		if err != nil {
 			fmt.Println("Error decoding JSON")
 		}
 
 		switch jsonData["action"] {
-		case "getTest":
-			fmt.Println("sain nupp 1 kätte!")
-		case "katsetus":
-			fmt.Println("sain nupp 2 kätte!")
+		case "login":
+			// login here
+			fmt.Println("login! (nupp 1)")
+		case "register":
+			// register here
+			fmt.Println("register! (nupp 2)")
 		}
 
 		conn.WriteJSON(PageData)
