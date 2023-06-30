@@ -45,38 +45,31 @@ class Client {
         }
     }
 
-    register(){
-        console.log("jah")
-        Register()
-    }
 
-    sendLogin() {
-        let form = document.getElementById("welcome");
-        let submitter = document.querySelector("button[value=Login]");
+    formTemplate(id, btnValue, action){
+        let form = document.getElementById(id);
+        let submitter = document.querySelector(`button[value=${btnValue}]`);
         let formData = new FormData(form, submitter);
-        let object = { action: "login" };
+        let object = { action: `${action}` };
         formData.forEach((value, key) => object[key] = value);
         var json = JSON.stringify(object);
         this.mysocket.send(json);
+    }
 
-        // console.log("terekest!")
-        // this.mysocket.send(JSON.stringify( { action: "getTest"}))
+
+    
+    // button actions
+
+    sendLogin() {
+        this.formTemplate("welcome", "Login", "login")
     }
 
     sendRegister(){
-        let form = document.getElementById("register");
-        let submitter = document.querySelector("button[value=New]");
-        let formData = new FormData(form, submitter);
-        let object = { action: "register" };
-        formData.forEach((value, key) => object[key] = value);
-        var json = JSON.stringify(object);
-        this.mysocket.send(json);
-
+        this.formTemplate("register", "Register", "register")
     }
+
+
+
 }
 
 
-const Register = () => {
-    console.log(document.getElementById("register_nickname").innerHTML)
-    console.log(document.getElementById("register_nickname").innerText)
-}
