@@ -3,45 +3,61 @@
 <head>
     <title>real-time-forum</title>
     <link rel="shortcut icon" href="#">
+    <script src="websocket.js"></script>
 </head>
 
 
 <body>
 
-    <div id="welcomeForm">
-        <form id="welcome" action="javascript:client.sendLogin()">
-            <h1>WELCOME!</h1>
+    <div id="loginForm">
+        <form id="login" action="javascript:client.sendLogin()">
+            <input type="text" placeholder="Username" name="login_id">
+            <input type="password" placeholder="Password" name="login_pw" >
             <input type="submit" class="button" value="Login">
         </form>
     </div>
     
-    <div id="registerForm">
+    <div id="newaccountForm">
+        <form id="sendToRegister" action="javascript:client.sendToRegister()">
+            <input type="submit" class="button" value="Create a new account!">
+        </form>
+    </div>
+
+    <div id="registerForm" style="display:none">
         <form id="register" action="javascript:client.sendRegister()">
-            <input type="text" placeholder="Nickname" id="register_nickname">
-            <input type="text" placeholder="Age" id="register_age">
-            <input type="text" placeholder="Gender" id="register_gender">
-            <input type="text" placeholder="First Name" id="register_fname">
-            <input type="text" placeholder="Last Name" id="register_lname">
-            <input type="text" placeholder="E-mail" id="register_mail">
-            <input type="text" placeholder="Password" id="register_passwd">
+            <input type="text" placeholder="Nickname" name="register_nickname">
+            <input type="text" placeholder="Age" name="register_age">
+            <input type="text" placeholder="Gender" name="register_gender">
+            <input type="text" placeholder="First Name" name="register_fname">
+            <input type="text" placeholder="Last Name" name="register_lname">
+            <input type="text" placeholder="E-mail" name="register_mail">
+            <input type="text" placeholder="Password" name="register_passwd">
             <input type="submit" class="button" value="Register">
         </form>
         
     </div>
 
 
-    <div id="errorContainer"></div>
+    <div id="forum" style="display:none;">
+        Tervetuloa! Seen meie foorium
+    </div>
 
+    <div id="logout" style="display:none;">
+        <h3 id="CurrentUser"></h3>
+        <form id="logout" action="javascript:client.sendLogout()">
+            <input type="submit" class="button" value="Logout">
+        </form>
+    </div>
 
-<script src="websocket.js"></script>
 
 
  
 
-<script>
-    const client = new Client()
-    client.connect()
-</script>
+    <script>
+        const client = new Client()
+        client.connect()
+    </script>
+
 </body>
 
 

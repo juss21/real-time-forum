@@ -16,3 +16,9 @@ type Forum struct {
 }
 
 var PageData Forum
+
+type loginMessage struct {
+	Action  string
+	Name    string
+	Message string
+}
