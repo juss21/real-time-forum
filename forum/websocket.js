@@ -32,21 +32,18 @@ class Client {
                 console.log("WebSocket Connection established!")
             }
             ws.onmessage = (e) => {
-                console.log("WebSocket Message Received!")
+                console.log("Message recieved!")
             }
-
-
             ws.onclose = (e) => {
                 console.log("WebSocket connection Lost!", e)
             }
-
         } catch (error) {
             console.log("Error:", error)
         }
     }
 
 
-    formTemplate(id, btnValue, action){
+    formTemplate(id, btnValue, action){        
         let form = document.getElementById(id);
         let submitter = document.querySelector(`button[value=${btnValue}]`);
         let formData = new FormData(form, submitter);
@@ -56,8 +53,6 @@ class Client {
         this.mysocket.send(json);
     }
 
-
-    
     // button actions
 
     sendLogin() {
@@ -67,9 +62,4 @@ class Client {
     sendRegister(){
         this.formTemplate("register", "Register", "register")
     }
-
-
-
 }
-
-
