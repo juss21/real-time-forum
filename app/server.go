@@ -15,6 +15,8 @@ func StartServer(port string) {
 
 	http.Handle("/", http.StripPrefix("/", fs))
 	http.HandleFunc("/ws", WebsocketHandler)
+	// http.HandleFunc("/login", LoginHandler)
+	// http.HandleFunc("/register", RegisterHandler)
 
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }

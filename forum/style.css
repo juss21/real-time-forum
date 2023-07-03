@@ -2,3 +2,20 @@ body {
     background-color: black;
     color: white;
 }
+
+.nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--nav-width);
+    height: 100vh;
+    background-color: black;
+}
+
+.nav__link{
+    display: block;
+    padding: 12px 18px;
+    text-decoration: none;
+    color: aliceblue;
+    font-weight: 500;
+}

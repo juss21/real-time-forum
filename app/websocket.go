@@ -24,10 +24,10 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
-	// conn, err := upgrader.Upgrade(w, r, nil)
-	// errorHandler(err)
+	_, err := upgrader.Upgrade(w, r, nil)
+	errorHandler(err)
 	// handling incoming messages
-	// go wsReader(conn, r)
+	//go wsReader(conn, r)
 }
 
 func (c *Client) wsReader(r *http.Request) {
