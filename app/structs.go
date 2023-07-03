@@ -1,5 +1,12 @@
 package app
 
+import "github.com/gorilla/websocket"
+
+// websocket client
+type Client struct {
+	ws *websocket.Conn
+}
+
 // information that will be pushed in to the site
 type CurrentUser struct {
 	UserID     int

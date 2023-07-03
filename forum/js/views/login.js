@@ -21,6 +21,7 @@ export function createLoginPage() {
     const loginForm = document.createElement("form");
     loginForm.id = "login";
     loginForm.action = "javascript:client.sendLogin()";
+    loginForm.method = "POST"
 
     // Create Username input
     const usernameInput = document.createElement("input");

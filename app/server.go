@@ -8,13 +8,14 @@ import (
 
 func StartServer(port string) {
 
-	fs := noDirListing(http.FileServer(http.Dir("./forum"))) //nodirlisting to avoid guest seeing all files stored in /web/images/
+	fs := noDirListing(http.FileServer(http.Dir("./forum/"))) //nodirlisting to avoid guest seeing all files stored in /web/images/
 
 	log.Printf("Starting server at port " + port + "\n\n")
 	log.Printf("http://localhost:" + port + "/\n")
 
-	http.Handle("/", http.StripPrefix("/", fs))
+	http.Handle("/forum/", http.StripPrefix("/forum", fs)) // handling forum file
 	http.HandleFunc("/ws", WebsocketHandler)
+	http.HandleFunc("/", HomePageHandler)
 	http.HandleFunc("/login", LoginHandler)
 	http.HandleFunc("/register", RegisterHandler)
 

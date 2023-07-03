@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -15,19 +16,36 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-type Client struct {
-	ws *websocket.Conn
-}
+var savedSockets []*Client
 
 func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Websocket request received!")
 
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
-	_, err := upgrader.Upgrade(w, r, nil)
+	log.Println("Websocket request!")
+	if savedSockets == nil {
+		savedSockets = make([]*Client, 0)
+	}
+
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Println(err)
+		}
+		r.Body.Close()
+	}()
+
+	connection, err := upgrader.Upgrade(w, r, nil)
 	errorHandler(err)
+
+	socketReader := &Client{
+		ws: connection,
+	}
+
+	savedSockets = append(savedSockets, socketReader)
+
 	// handling incoming messages
-	//go wsReader(conn, r)
+	socketReader.wsReader(r)
 }
 
 func (c *Client) wsReader(r *http.Request) {
@@ -39,7 +57,7 @@ func (c *Client) wsReader(r *http.Request) {
 			} else if err == websocket.ErrCloseSent {
 				fmt.Println("WebSocket connection closed by client")
 			} else {
-				fmt.Println("Error reading message!")
+				errorHandler(err)
 			}
 			return
 		}
