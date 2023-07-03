@@ -12,7 +12,6 @@ export function createRegisterPage() {
     // Create registerForm div
     const registerFormDiv = document.createElement("div");
     registerFormDiv.id = "registerForm";
-    registerFormDiv.style.display = "none";
 
     // Create register form
     const registerForm = document.createElement("form");

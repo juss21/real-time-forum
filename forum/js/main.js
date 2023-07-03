@@ -1,5 +1,6 @@
 import { createLoginPage } from "./views/login.js"
 import { createRegisterPage } from "./views/register.js"
+import { createHomePage } from "./views/home.js"
 window.onload = () => {
     window.addEventListener("popstate", router)
     router()
@@ -16,7 +17,7 @@ async function router() {
     const routes = [
         {
             path: "/",
-            view: createLoginPage
+            view: createHomePage
         },
         {
             path: "/login",
@@ -29,15 +30,18 @@ async function router() {
     ]
 
     // test each route for potential match
-    const pontentialMatches = routes.map(route => {
+    const potentialMatches = routes.map(route => {
+        const isMatch = location.pathname === route.path
+        const params = isMatch ? [] : null 
         return {
-            route: route,
-            isMatch: location.pathname === route.path
+            route,
+            isMatch,
+            params
         }
     })
  
     
-    let matchFound = pontentialMatches.find(pontentialMatch => pontentialMatch.isMatch)
+    let matchFound = potentialMatches.find(potentialMatches => potentialMatches.isMatch)
 
     // if no match, route back to homepage "/"
     if (!matchFound) {
@@ -48,13 +52,13 @@ async function router() {
     } 
 
 
-    console.log(matchFound.route.view()) // <- changing scene with this
+    console.log(matchFound.route.view(matchFound.params)) // <- changing scene with this
 }
 
 
 document.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("click", (e) => {
-        if (e.target.isMatch("[data-link]")) {
+        if (e.target.matches("[data-link]")) {
             e.preventDefault()
             navigateTo(e.target.href)
         }
