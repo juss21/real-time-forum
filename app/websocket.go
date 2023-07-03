@@ -15,7 +15,8 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-type socket struct {
+type Client struct {
+	ws *websocket.Conn
 }
 
 func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
@@ -23,15 +24,15 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
-	conn, err := upgrader.Upgrade(w, r, nil)
-	errorHandler(err)
+	// conn, err := upgrader.Upgrade(w, r, nil)
+	// errorHandler(err)
 	// handling incoming messages
-	go wsReader(conn, r)
+	// go wsReader(conn, r)
 }
 
-func wsReader(conn *websocket.Conn, r *http.Request) {
+func (c *Client) wsReader(r *http.Request) {
 	for {
-		_, message, err := conn.ReadMessage()
+		_, message, err := c.ws.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
 				fmt.Println("WebSocket connection closed")
@@ -64,14 +65,14 @@ func wsReader(conn *websocket.Conn, r *http.Request) {
 			}
 			loginReply, err := json.Marshal(message)
 			errorHandler(err)
-			conn.WriteMessage(websocket.TextMessage, []byte(loginReply))
+			c.ws.WriteMessage(websocket.TextMessage, []byte(loginReply))
 			doLogin(jsonData["login_id"], jsonData["login_pw"])
 		case "register":
 			// register here
 			fmt.Println("register! (nupp 2)")
 		}
 
-		conn.WriteJSON(PageData)
+		c.ws.WriteJSON(PageData)
 	}
 }
 
