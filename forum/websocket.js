@@ -1,5 +1,6 @@
 let host = "localhost"
 
+
 // WEBSOCKET
 class Client {
     constructor() {
