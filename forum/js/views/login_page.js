@@ -1,4 +1,6 @@
-export default function () {
+export default function () {    
+    document.title = "Login"
+
     document.getElementById("app").innerHTML = `
     <form id="loginForm" action="javascript:" method="POST">
 
@@ -52,7 +54,8 @@ async function loginResponse(response){
     if (response.ok){
         let data = await response.json()
         localStorage.setItem("userData", JSON.stringify(data))
-        // window.location.href = "/"
+        
+        window.location.href = "/"
     } else {
         let message = await response.text()
         document.getElementById("ErrorBox").innerHTML = message.replace("Login unsuccessfuly: ", "")

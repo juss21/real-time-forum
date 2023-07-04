@@ -2,9 +2,16 @@ import home_page from "./views/home_page.js"
 import error_page from "./views/error_page.js"
 import login_page from "./views/login_page.js"
 import register_page from "./views/register_page.js"
-import { wsAddConnection } from "./websocket.js"
+import logout_page from "./views/logout_page.js"
 
-wsAddConnection()
+import { wsAddConnection } from "./websocket.js"
+import { hasSession } from "./helpers.js"
+
+export let isAuthenticated = await hasSession()
+
+if (isAuthenticated){
+    wsAddConnection()
+}
 
 window.onload = () => {
     window.addEventListener("popstate", router)
@@ -31,6 +38,10 @@ async function router() {
         {
             path: "/register",
             view: register_page
+        },
+        {
+            path: "/logout",
+            view: logout_page
         }
     ]
 

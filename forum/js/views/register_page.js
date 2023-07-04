@@ -1,4 +1,8 @@
 export default function () {
+
+
+    document.title = "Register"
+
     document.getElementById("app").innerHTML = `
             <form id="registerForm" method="POST">
                 <input type="text" placeholder="Nickname" name="register_nickname">
