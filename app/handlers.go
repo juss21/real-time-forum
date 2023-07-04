@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -20,22 +21,33 @@ func createAndExecuteTemplate(w http.ResponseWriter, r *http.Request) {
 
 func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 	createAndExecuteTemplate(w, r)
-	log.Println("Home!")
 
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	createAndExecuteTemplate(w, r)
+func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Attempting to log in")
 	var loginInfo LoginInfo
-	err := json.NewDecoder(r.Body).Decode(loginInfo)
+	err := json.NewDecoder(r.Body).Decode(&loginInfo)
 	errorHandler(err)
 
-	log.Println("login!")
+	fmt.Println(loginInfo)
 
-}
+	if loginInfo.Login != "" || loginInfo.Password != "" {
+		// w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Bad login!"))
+		return
+	} else {
+		response := loginMessage{
+			Name:    "Testike",
+			UID:     "3",
+			Message: "terekest!",
+		}
 
-func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	createAndExecuteTemplate(w, r)
-	log.Println("register!")
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
 
 }

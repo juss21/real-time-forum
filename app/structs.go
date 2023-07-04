@@ -18,12 +18,12 @@ type Forum struct {
 var PageData Forum
 
 type loginMessage struct {
-	Action  string
 	Name    string
+	UID     string
 	Message string
 }
 
 type LoginInfo struct {
-	Login    string `json:"loginid"`
-	Password string `json:"password"`
+	Login    string `json:"login_id"`
+	Password string `json:"login_pw"`
 }

@@ -64,7 +64,6 @@ func wsReader(conn *websocket.Conn) {
 }
 
 func doLogin(user, password string) {
-	fmt.Println("login! (nupp 1)")
 
 	fmt.Println(user)
 	fmt.Println(password)
