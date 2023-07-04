@@ -52,7 +52,7 @@ async function router() {
     } 
 
 
-    console.log(matchFound.route.view(matchFound.params)) // <- changing scene with this
+    matchFound.route.view(matchFound.params) // <- changing scene with this
 }
 
 

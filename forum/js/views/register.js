@@ -16,7 +16,7 @@ export function createRegisterPage() {
     // Create register form
     const registerForm = document.createElement("form");
     registerForm.id = "register";
-    registerForm.action = "javascript:client.sendRegister()";
+    registerForm.action = "javascript:client.sendRegisterMessage()";
     registerForm.method = "POST"
 
     // Create input fields for registration

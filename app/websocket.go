@@ -16,81 +16,50 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-var savedSockets []*Client
-
-func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
-
-	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-
+// websocket client
+func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	log.Println("Websocket request!")
-	if savedSockets == nil {
-		savedSockets = make([]*Client, 0)
-	}
-
-	defer func() {
-		err := recover()
-		if err != nil {
-			log.Println(err)
-		}
-		r.Body.Close()
-	}()
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
 	connection, err := upgrader.Upgrade(w, r, nil)
 	errorHandler(err)
 
-	socketReader := &Client{
-		ws: connection,
-	}
+	log.Println("Client Successfully connected!")
 
-	savedSockets = append(savedSockets, socketReader)
-
-	// handling incoming messages
-	socketReader.wsReader(r)
+	wsReader(connection)
 }
 
-func (c *Client) wsReader(r *http.Request) {
+func wsReader(conn *websocket.Conn) {
 	for {
-		_, message, err := c.ws.ReadMessage()
+		messageType, message, err := conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
-				fmt.Println("WebSocket connection closed")
+				log.Println("WebSocket connection closed")
 			} else if err == websocket.ErrCloseSent {
-				fmt.Println("WebSocket connection closed by client")
+				log.Println("WebSocket connection closed by the client")
 			} else {
-				errorHandler(err)
+				log.Println(err)
 			}
 			return
 		}
 
+		fmt.Println("Type:", string(messageType))
 		fmt.Println(string(message))
-
 		var jsonData map[string]string // json string map
 		err = json.Unmarshal(message, &jsonData)
-
-		if err != nil {
-			fmt.Println("Error decoding JSON")
-		}
+		errorHandler(err)
 
 		switch jsonData["action"] {
 		case "login":
-			// login here
-			fmt.Println(r.FormValue("login_id"))
-			fmt.Println(r.FormValue("login_pw"))
-			message := loginMessage{
-				Action:  "Login",
-				Name:    jsonData["login_id"],
-				Message: "Willkommen, " + jsonData["login_id"] + "!",
-			}
-			loginReply, err := json.Marshal(message)
-			errorHandler(err)
-			c.ws.WriteMessage(websocket.TextMessage, []byte(loginReply))
 			doLogin(jsonData["login_id"], jsonData["login_pw"])
 		case "register":
-			// register here
 			fmt.Println("register! (nupp 2)")
 		}
 
-		c.ws.WriteJSON(PageData)
+		if err := conn.WriteMessage(messageType, message); err != nil {
+			log.Println(err)
+			return
+		}
 	}
 }
 

@@ -1,8 +1,9 @@
 package app
 
 import (
-	"fmt"
+	"encoding/json"
 	"html/template"
+	"log"
 	"net/http"
 )
 
@@ -19,18 +20,22 @@ func createAndExecuteTemplate(w http.ResponseWriter, r *http.Request) {
 
 func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 	createAndExecuteTemplate(w, r)
-	fmt.Println("Home!")
+	log.Println("Home!")
 
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	createAndExecuteTemplate(w, r)
-	fmt.Println("login!")
+	var loginInfo LoginInfo
+	err := json.NewDecoder(r.Body).Decode(loginInfo)
+	errorHandler(err)
+
+	log.Println("login!")
 
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	createAndExecuteTemplate(w, r)
-	fmt.Println("register!")
+	log.Println("register!")
 
 }

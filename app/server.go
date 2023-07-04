@@ -14,7 +14,7 @@ func StartServer(port string) {
 	log.Printf("http://localhost:" + port + "/\n")
 
 	http.Handle("/forum/", http.StripPrefix("/forum", fs)) // handling forum file
-	http.HandleFunc("/ws", WebsocketHandler)
+	http.HandleFunc("/ws", wsEndpoint)
 	http.HandleFunc("/", HomePageHandler)
 	http.HandleFunc("/login", LoginHandler)
 	http.HandleFunc("/register", RegisterHandler)

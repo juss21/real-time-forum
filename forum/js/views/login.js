@@ -20,7 +20,7 @@ export function createLoginPage() {
     // Create login form
     const loginForm = document.createElement("form");
     loginForm.id = "login";
-    loginForm.action = "javascript:client.sendLogin()";
+    loginForm.action = "javascript:client.sendLoginMessage()";
     loginForm.method = "POST"
 
     // Create Username input
@@ -56,22 +56,15 @@ export function createLoginPage() {
     const newaccountFormDiv = document.createElement("div");
     newaccountFormDiv.id = "newaccountForm";
 
-    // Create sendToRegister form
-    const sendToRegisterForm = document.createElement("form");
-    sendToRegisterForm.id = "sendToRegister";
-    sendToRegisterForm.action = "javascript:client.sendToRegister()";
-
     // Create Create a new account button
-    const newAccountButton = document.createElement("input");
-    newAccountButton.type = "submit";
-    newAccountButton.className = "button";
-    newAccountButton.value = "Create a new account!";
+    const newAccountHref = document.createElement("a");
+    newAccountHref.href = "/register";
+    newAccountHref.innerHTML = "Create a new account!";
+    newAccountHref.className = "nav__link"
 
     // Append new account button to sendToRegister form
-    sendToRegisterForm.appendChild(newAccountButton);
+    newaccountFormDiv.appendChild(newAccountHref);
 
-    // Append sendToRegister form to newaccountForm div
-    newaccountFormDiv.appendChild(sendToRegisterForm);
 
     // Appending newaccountForm div to body
     document.getElementById("app").appendChild(newaccountFormDiv)
