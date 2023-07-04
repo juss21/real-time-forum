@@ -33,8 +33,8 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(loginInfo)
 
 	if loginInfo.Login != "" || loginInfo.Password != "" {
-		// w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Bad login!"))
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("sitt login!"))
 		return
 	} else {
 		response := loginMessage{

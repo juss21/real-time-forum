@@ -40,6 +40,7 @@ function loginListener(){
 
         try {
             let response = await fetch("/login-attempt", options)
+            console.log(response)
             loginResponse(response)
         } catch  (e){
             console.error(e)
@@ -52,8 +53,8 @@ async function loginResponse(response){
         let data = await response.json()
         localStorage.setItem("userData", JSON.stringify(data))
         // window.location.href = "/"
-        document.getElementById("ErrorBox").innerHTML = ""
     } else {
-        document.getElementById("ErrorBox").innerHTML = "Bad login!"
+        let message = await response.text()
+        document.getElementById("ErrorBox").innerHTML = message.replace("Login unsuccessfuly: ", "")
     }
 }

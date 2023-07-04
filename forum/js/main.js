@@ -2,6 +2,9 @@ import home_page from "./views/home_page.js"
 import error_page from "./views/error_page.js"
 import login_page from "./views/login_page.js"
 import register_page from "./views/register_page.js"
+import { wsAddConnection } from "./websocket.js"
+
+wsAddConnection()
 
 window.onload = () => {
     window.addEventListener("popstate", router)
