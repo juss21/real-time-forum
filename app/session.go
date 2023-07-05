@@ -26,7 +26,7 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 			&password,
 		)
 	}
-	if (loginInfo.Login == username || loginInfo.Login == username) && loginInfo.Password == password {
+	if (loginInfo.Login == username || loginInfo.Login == email) && loginInfo.Password == password {
 		response := loginMessage{
 			Name:    "Testike",
 			UID:     "3",
