@@ -43,18 +43,18 @@ func wsReader(conn *websocket.Conn) {
 			return
 		}
 
-		fmt.Println("Type:", string(messageType))
-		fmt.Println(string(message))
+		// fmt.Println("Type:", string(messageType))
+		// fmt.Println(string(message))
 		var jsonData map[string]string // json string map
 		err = json.Unmarshal(message, &jsonData)
 		errorHandler(err)
 
-		switch jsonData["action"] {
-		case "login":
-			doLogin(jsonData["login_id"], jsonData["login_pw"])
-		case "register":
-			fmt.Println("register! (nupp 2)")
-		}
+		// switch jsonData["action"] {
+		// case "login":
+		// 	doLogin(jsonData["login_id"], jsonData["login_pw"])
+		// case "register":
+		// 	fmt.Println("register! (nupp 2)")
+		// }
 
 		if err := conn.WriteMessage(messageType, message); err != nil {
 			log.Println(err)

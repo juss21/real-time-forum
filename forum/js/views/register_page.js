@@ -1,6 +1,5 @@
 export default function () {
 
-
     document.title = "Register"
 
     document.getElementById("app").innerHTML = `
@@ -15,5 +14,5 @@ export default function () {
                 <button type="submit" class="button">Submit!</button>
 
             </form>
-    `
+    ` 
 }

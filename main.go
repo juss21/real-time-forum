@@ -1,14 +1,18 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	"01.kood.tech/git/kasepuu/real-time-forum/app"
+	"01.kood.tech/git/kasepuu/real-time-forum/sqldb"
 )
 
 func main() {
+	file, err := os.Stat("database.db")
 
 	// fetching port from templates folder
 	portFromFile, err := os.ReadFile("forum/port.txt")
@@ -18,6 +22,15 @@ func main() {
 		fmt.Println("path: /forum/port.txt")
 		fmt.Println("<port.txt> file not found or corrupt, please enter port for webserver manually:")
 		fmt.Scanln(&port)
+	}
+
+	// if .db file deleted, it will create new one and populate with data
+	if errors.Is(err, os.ErrNotExist) {
+		app.DataBase, _ = sql.Open("sqlite3", "database.db")
+		sqldb.InitDatabase()
+		fmt.Println("New database created ", file)
+	} else {
+		app.DataBase, _ = sql.Open("sqlite3", "./database.db")
 	}
 
 	app.StartServer(port) // server

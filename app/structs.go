@@ -1,5 +1,7 @@
 package app
 
+import "database/sql"
+
 // information that will be pushed in to the site
 type CurrentUser struct {
 	UserID     int
@@ -27,3 +29,5 @@ type LoginInfo struct {
 	Login    string `json:"login_id"`
 	Password string `json:"login_pw"`
 }
+
+var DataBase *sql.DB
