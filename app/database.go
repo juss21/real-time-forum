@@ -1,10 +1,9 @@
-package sqldb
+package app
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
-
-	"01.kood.tech/git/kasepuu/real-time-forum/app"
 )
 
 func InitDatabase() {
@@ -12,6 +11,6 @@ func InitDatabase() {
 	if err != nil {
 		log.Println(err)
 	}
-
-	app.DataBase.Exec(string(file))
+	fmt.Println("ok")
+	DataBase.Exec(string(file))
 }

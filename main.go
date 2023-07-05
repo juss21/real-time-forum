@@ -8,11 +8,11 @@ import (
 	"strings"
 
 	"01.kood.tech/git/kasepuu/real-time-forum/app"
-	"01.kood.tech/git/kasepuu/real-time-forum/sqldb"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
-	file, err := os.Stat("database.db")
+	file, err := os.Stat("database/database.db")
 
 	// fetching port from templates folder
 	portFromFile, err := os.ReadFile("forum/port.txt")
@@ -27,10 +27,13 @@ func main() {
 	// if .db file deleted, it will create new one and populate with data
 	if errors.Is(err, os.ErrNotExist) {
 		app.DataBase, _ = sql.Open("sqlite3", "database.db")
-		sqldb.InitDatabase()
+		app.InitDatabase()
 		fmt.Println("New database created ", file)
 	} else {
-		app.DataBase, _ = sql.Open("sqlite3", "./database.db")
+		var errr error
+		app.DataBase, errr = sql.Open("sqlite3", "/database.db")
+
+		fmt.Println(errr)
 	}
 
 	app.StartServer(port) // server
