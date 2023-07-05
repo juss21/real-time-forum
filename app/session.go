@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	//"strings"
 )
 
 func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
@@ -14,17 +15,11 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 	errorHandler(err)
 	fmt.Println(loginInfo)
 
-	rows, _ := DataBase.Query(`SELECT username, email, password FROM users`)
 
-	var username, email, password string
-	for rows.Next() {
-		rows.Scan(
-			&username,
-			&email,
-			&password,
-		)
-	}
-	if (loginInfo.Login == username || loginInfo.Login == email) && loginInfo.Password == password {
+	var password string
+	rows := DataBase.QueryRow("SELECT password FROM users WHERE username = ? OR email = ?", loginInfo.Login, loginInfo.Login)
+	rows.Scan(&password)
+	if loginInfo.Password == password && loginInfo.Password != "" {
 		response := loginMessage{
 			Name:    "Testike",
 			UID:     "3",
