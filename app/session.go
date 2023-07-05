@@ -14,13 +14,11 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 	errorHandler(err)
 	fmt.Println(loginInfo)
 
-	rows, _ := DataBase.Query(`SELECT id, username, email, password FROM users`)
+	rows, _ := DataBase.Query(`SELECT username, email, password FROM users`)
 
-	var id int
 	var username, email, password string
 	for rows.Next() {
 		rows.Scan(
-			&id,
 			&username,
 			&email,
 			&password,
