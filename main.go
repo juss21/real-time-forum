@@ -24,16 +24,13 @@ func main() {
 		fmt.Scanln(&port)
 	}
 
-	// if .db file deleted, it will create new one and populate with data
+	// if .db file deleted, it will create new one and populate it with data
 	if errors.Is(dberr, os.ErrNotExist) {
-		app.DataBase, _ = sql.Open("sqlite3", "database.db")
+		app.DataBase, _ = sql.Open("sqlite3", "database/database.db")
 		app.InitDatabase()
 		fmt.Println("New database created ", file)
 	} else {
-		var errr error
-		app.DataBase, errr = sql.Open("sqlite3", "/database.db")
-
-		fmt.Println(errr)
+		app.DataBase, _ = sql.Open("sqlite3", "/database.db")
 	}
 
 	app.StartServer(port) // server
