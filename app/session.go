@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	//"strings"
+	"github.com/gofrs/uuid"
 )
 
 func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
@@ -17,16 +17,19 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 
 
 	var password string
-	rows := DataBase.QueryRow("SELECT password FROM users WHERE username = ? OR email = ?", loginInfo.Login, loginInfo.Login)
-	rows.Scan(&password)
+	var userId int
+	rows := DataBase.QueryRow("SELECT password, id FROM users WHERE username = ? OR email = ?", loginInfo.Login, loginInfo.Login)
+	rows.Scan(&password, &userId)
+	id, _ := uuid.NewV4()
 	if loginInfo.Password == password && loginInfo.Password != "" {
-		response := loginMessage{
-			Name:    "Testike",
-			UID:     "3",
-			Message: "terekest!",
+		cookie := &http.Cookie{
+			Name:    "session-id",
+			Value:   id.String(),
 		}
+		http.SetCookie(w, cookie)
+		SaveSession(cookie.Value, userId)
 
-		err = json.NewEncoder(w).Encode(response)
+		err = json.NewEncoder(w).Encode(cookie)
 		if err != nil {
 			log.Println(err)
 			return
@@ -38,8 +41,27 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CookieCheckHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Cookie check!")
-	//cockieId := r.URL.Query().Get("cookieId")
+func SaveSession(key string, userId int) {
+	DataBase.Exec("DELETE FROM session WHERE userId = ?", userId)
 
+	statement, _ := DataBase.Prepare("INSERT INTO session (key, userId) VALUES (?,?)")
+	_, err := statement.Exec(key, userId)
+	if err != nil {
+		fmt.Println("one per user")
+	}
+}
+
+func LogoutAttemptHandler(w http.ResponseWriter, r *http.Request) {
+	//if !Web.Loggedin {
+		fmt.Println("SIIIIIIIN")
+		cookie, _ := r.Cookie("session-id")
+		DataBase.Exec("DELETE FROM session WHERE key = ?", cookie.Value)
+		fmt.Println("TEHTUD")
+
+		http.SetCookie(w, &http.Cookie{
+			Name:   "session-id",
+			Value:  "",
+			MaxAge: -1,
+		})
+	//}
 }

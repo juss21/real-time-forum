@@ -17,6 +17,8 @@ func StartServer(port string) {
 	http.HandleFunc("/ws", wsEndpoint)
 	http.HandleFunc("/", HomePageHandler)
 	http.HandleFunc("/login-attempt", LoginAttemptHandler)
+	http.HandleFunc("/logout-attempt", LogoutAttemptHandler)
+
 
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }
