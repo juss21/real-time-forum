@@ -14,11 +14,19 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 	errorHandler(err)
 	fmt.Println(loginInfo)
 
-	if loginInfo.Login != "" || loginInfo.Password != "" {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("sitt login!"))
-		return
-	} else {
+	rows, _ := DataBase.Query(`SELECT id, username, email, password FROM users`)
+
+	var id int
+	var username, email, password string
+	for rows.Next() {
+		rows.Scan(
+			&id,
+			&username,
+			&email,
+			&password,
+		)
+	}
+	if (loginInfo.Login == username || loginInfo.Login == username) && loginInfo.Password == password {
 		response := loginMessage{
 			Name:    "Testike",
 			UID:     "3",
@@ -30,8 +38,11 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("sitt login!"))
+		return
 	}
-
 }
 
 func CookieCheckHandler(w http.ResponseWriter, r *http.Request) {

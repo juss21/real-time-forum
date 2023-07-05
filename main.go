@@ -12,7 +12,12 @@ import (
 )
 
 func main() {
-	file, dberr := os.Stat("database/database.db")
+	db, err := sql.Open("sqlite3", "database/database.db")
+	if err != nil {
+		fmt.Println("Error opening the database:", err)
+		return
+	}
+	defer db.Close()
 
 	// fetching port from templates folder
 	portFromFile, err := os.ReadFile("forum/port.txt")
@@ -24,14 +29,19 @@ func main() {
 		fmt.Scanln(&port)
 	}
 
-	// if .db file deleted, it will create new one and populate it with data
-	if errors.Is(dberr, os.ErrNotExist) {
+	// if .db file deleted, it will create new one and populate with data
+	if errors.Is(err, os.ErrNotExist) {
 		app.DataBase, _ = sql.Open("sqlite3", "database/database.db")
 		app.InitDatabase()
-		fmt.Println("New database created ", file)
+		defer app.DataBase.Close()
+		fmt.Println("New database created ")
 	} else {
-		app.DataBase, _ = sql.Open("sqlite3", "/database.db")
+		var errr error
+		app.DataBase, errr = sql.Open("sqlite3", "database/database.db")
+		fmt.Println(errr)
+		defer app.DataBase.Close()
 	}
+	
 
 	app.StartServer(port) // server
 }
