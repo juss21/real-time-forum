@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	file, err := os.Stat("database/database.db")
+	file, dberr := os.Stat("database/database.db")
 
 	// fetching port from templates folder
 	portFromFile, err := os.ReadFile("forum/port.txt")
@@ -25,7 +25,7 @@ func main() {
 	}
 
 	// if .db file deleted, it will create new one and populate with data
-	if errors.Is(err, os.ErrNotExist) {
+	if errors.Is(dberr, os.ErrNotExist) {
 		app.DataBase, _ = sql.Open("sqlite3", "database.db")
 		app.InitDatabase()
 		fmt.Println("New database created ", file)
