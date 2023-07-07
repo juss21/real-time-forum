@@ -24,8 +24,8 @@ function loginListener(){
     let loginData = {}
     
     loginForm.addEventListener("submit", async (e) =>{
-        console.log("submit button!")
-
+        e.preventDefault()
+        
         var formData = new FormData(loginForm)
 
         for (var [key, value] of formData.entries()){
@@ -42,7 +42,6 @@ function loginListener(){
 
         try {
             let response = await fetch("/login-attempt", options)
-            console.log(response)
             loginResponse(response)
         } catch  (e){
             console.error(e)
@@ -53,11 +52,10 @@ function loginListener(){
 async function loginResponse(response){
     if (response.ok){
         let data = await response.json()
-        localStorage.setItem("userData", JSON.stringify(data))
-        
-        window.location.href = "/"
+        localStorage.setItem("currentUser", JSON.stringify(data))
+        window.location.href = "/" 
     } else {
         let message = await response.text()
-        document.getElementById("ErrorBox").innerHTML = message.replace("Login unsuccessfuly: ", "")
+        document.getElementById("ErrorBox").innerHTML = message.replace()
     }
 }

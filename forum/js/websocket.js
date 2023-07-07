@@ -8,8 +8,8 @@ export class Client {
 
 
 export function wsAddConnection(){
-    let user = JSON.parse(localStorage.getItem("userData"))
-    let ws = new WebSocket(`ws://${document.location.host}/ws`)
+    let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+    let ws = new WebSocket(`ws://${document.location.host}/ws?UserID=${currentUser}`)
 
     ws.onopen = () => {
         console.log("WebSocket Connection established!")
@@ -22,4 +22,6 @@ export function wsAddConnection(){
     ws.onclose = (e) => {
         console.log("WebSocket connection Lost!", e)
     }
+
+    window.socket = ws
 }

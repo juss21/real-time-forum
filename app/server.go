@@ -13,12 +13,12 @@ func StartServer(port string) {
 	log.Printf("Starting server at port " + port + "\n\n")
 	log.Printf("http://localhost:" + port + "/\n")
 
-	http.Handle("/forum/", http.StripPrefix("/forum", fs)) // handling forum file
+	http.Handle("/forum/", http.StripPrefix("/forum", fs)) // handling forum folder
 	http.HandleFunc("/ws", wsEndpoint)
 	http.HandleFunc("/", HomePageHandler)
 	http.HandleFunc("/login-attempt", LoginAttemptHandler)
 	http.HandleFunc("/logout-attempt", LogoutAttemptHandler)
-
+	http.HandleFunc("/hasCookie", HasCookieHandler)
 
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }

@@ -7,8 +7,7 @@ import logout_page from "./views/logout_page.js"
 import { wsAddConnection } from "./websocket.js"
 import { hasSession } from "./helpers.js"
 
-export let isAuthenticated = await hasSession()
-
+const isAuthenticated = await hasSession()
 if (isAuthenticated){
     wsAddConnection()
 }
@@ -18,7 +17,7 @@ window.onload = () => {
     router()
 }
 
-function navigateTo(url) {
+export function navigateTo(url) {
     history.pushState(null, null, url)
     router()
 
@@ -36,10 +35,6 @@ async function router() {
             view: login_page
         },
         {
-            path: "/register",
-            view: register_page
-        },
-        {
             path: "/logout",
             view: logout_page
         }
@@ -47,19 +42,17 @@ async function router() {
 
     // test each route for potential match
     const potentialMatches = routes.map(route => {
-        const isMatch = location.pathname === route.path
+        const isMatchBoolean = location.pathname === route.path
         return {
-            route,
-            isMatch
+            route: route,
+            isMatch: isMatchBoolean
         }
     })
 
 
     let matchFound = potentialMatches.find(potentialMatches => potentialMatches.isMatch)
-
-    // if no match, route back to homepage "/"
     if (matchFound) {
-        matchFound.route.view()// <- changing scene with this
+        matchFound.route.view()// <- changing scenery with this
     } else {
         error_page();
     }

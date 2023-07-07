@@ -20,9 +20,20 @@ type Forum struct {
 var PageData Forum
 
 type loginMessage struct {
-	Name    string
-	UID     string
-	Message string
+	LoginName string
+	UserID    int
+	CookieKey string
+}
+
+type cookieResponse struct {
+	UserID    int
+	CookieKey string
+}
+
+type sessionInfo struct {
+	Name    string `json:"session-id"`
+	Value   string
+	Expires string
 }
 
 type LoginInfo struct {
