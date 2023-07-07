@@ -8,11 +8,13 @@ export async function hasSession() {
             localStorage.removeItem("currentUser")
         }
     }
+    return false
 }
 
 export async function hasCookie(cookie) {
     try {
-        let response = await fetch(`/hasCookie?CookieKey=${cookie.CookieKey}&UserID=${cookie.UserID}`)
+        const url = `/hasCookie?CookieKey=${cookie.CookieKey}&UserID=${cookie.UserID}`
+        const response = await fetch(url)
         
         if (response.ok) {
             console.log("session found")

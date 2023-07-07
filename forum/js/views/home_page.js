@@ -1,16 +1,12 @@
 import { hasSession } from "../helpers.js";
-import { navigateTo } from "../main.js";
+import { navigateTo } from "./router.js";
 
-export default async function() {
+export default async function () {
     const isAuthenticated = await hasSession()
-    if (!isAuthenticated){
+    if (!isAuthenticated) {
         navigateTo("/login")
-        window.location.href = "/login"
         return
     } else {
-
-        const url = new URL(window.location.href)
-        console.log(url)
 
         document.title = "Home"
 

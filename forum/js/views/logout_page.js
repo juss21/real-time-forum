@@ -1,29 +1,32 @@
 import { hasSession } from "../helpers.js"
+import { navigateTo } from "./router.js"
 
 export default async function () {
-    if (hasSession()){
+    if (hasSession()) {
         let currentUser = JSON.parse(localStorage.getItem("currentUser"))
         logoutAttempt(currentUser)
+    } else {
+        navigateTo("/")
     }
 }
 
-async function logoutAttempt(currentUser){
+async function logoutAttempt(currentUser) {
+    window.location.href = "/login"
     try {
-        let url = `/logout-attempt?UserID=${currentUser}`
+        let url = `/logout-attempt?UserID=${currentUser.UserID}`
         let response = await fetch(url)
         logoutResponse(response)
-    } catch (e){
+    } catch (e) {
         console.error(e)
         return false
-    } 
+    }
 }
 
-function logoutResponse(response){
-    if (response.ok){
+function logoutResponse(response) {
+    if (response.ok) {
         console.log("[Response] Logout succeeded!")
         localStorage.removeItem("currentUser")
-
-        window.location.href = "/login"
+        //navigateTo("/login") 
     } else {
         console.log("logout failed!")
     }
