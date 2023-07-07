@@ -16,8 +16,8 @@ func StartServer(port string) {
 	http.Handle("/forum/", http.StripPrefix("/forum", fs)) // handling forum folder
 	http.HandleFunc("/ws", wsEndpoint)
 	http.HandleFunc("/", HomePageHandler)
-	http.HandleFunc("/login-attempt", LoginAttemptHandler)
-	http.HandleFunc("/logout-attempt", LogoutAttemptHandler)
+	http.HandleFunc("/login-attempt", LoginHandler)
+	http.HandleFunc("/logout-attempt", LogoutHandler)
 	http.HandleFunc("/hasCookie", HasCookieHandler)
 
 	errorHandler(http.ListenAndServe(":"+port, nil))

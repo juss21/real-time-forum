@@ -1,3 +1,4 @@
+import { navigateTo } from "../main.js";
 export default function () {    
     document.title = "Login"
 
@@ -53,7 +54,7 @@ async function loginResponse(response){
     if (response.ok){
         let data = await response.json()
         localStorage.setItem("currentUser", JSON.stringify(data))
-        window.location.href = "/" 
+        navigateTo("/") 
     } else {
         let message = await response.text()
         document.getElementById("ErrorBox").innerHTML = message.replace()

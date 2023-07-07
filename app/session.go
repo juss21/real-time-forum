@@ -36,7 +36,7 @@ func createCookie(w http.ResponseWriter, loginInput string) string {
 	return session
 }
 
-func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Attempting to log in")
 
 	var loginInfo LoginInfo
@@ -66,6 +66,8 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 		CookieKey: createCookie(w, loginInfo.Login),
 	}
 
+	w.WriteHeader(http.StatusOK)
+
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		log.Println(err)
@@ -74,7 +76,7 @@ func LoginAttemptHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func LogoutAttemptHandler(w http.ResponseWriter, r *http.Request) {
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Attempting to log out")
 	userId := r.URL.Query().Get("UserID")
 
@@ -95,15 +97,19 @@ func LogoutAttemptHandler(w http.ResponseWriter, r *http.Request) {
 func HasCookieHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Attempting to authorize")
 	key := r.URL.Query().Get("CookieKey")
+	uid := r.URL.Query().Get("UserID")
+	fmt.Println(key, "\n", uid)
 
 	var hasCookie bool
-	err := DataBase.QueryRow("SELECT EXISTS(SELECT 1 FROM session WHERE key = ?)", key).Scan(&hasCookie)
+	err := DataBase.QueryRow("SELECT EXISTS(SELECT 1 FROM session WHERE key = ? AND userId = ?)", key, uid).Scan(&hasCookie)
 	errorHandler(err)
 
 	if hasCookie {
+		log.Println("Authorization was OK")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Session for user, has been found!"))
 	} else {
+		log.Println("Authorization was a Fail")
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Session for user, NOT FOUND!"))
 	}

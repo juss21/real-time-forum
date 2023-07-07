@@ -1,7 +1,7 @@
 export async function hasSession() {
     if (localStorage.getItem("currentUser")) {
         let currentUser = JSON.parse(localStorage.getItem("currentUser"))
-        let sessionExists = await hasCookie(currentUser.CookieKey)
+        let sessionExists = await hasCookie(currentUser)
         if (sessionExists) {
             return true
         } else {
@@ -10,9 +10,9 @@ export async function hasSession() {
     }
 }
 
-export async function hasCookie(key) {
+export async function hasCookie(cookie) {
     try {
-        let response = await fetch(`/hasCookie?CookieKey=${key}`)
+        let response = await fetch(`/hasCookie?CookieKey=${cookie.CookieKey}&UserID=${cookie.UserID}`)
         
         if (response.ok) {
             console.log("session found")
