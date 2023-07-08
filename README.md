@@ -1,15 +1,17 @@
 #### REAL-TIME-FORUM    
     
 README in progress...   
-
+    
 todo:   
 
-posts   
-comments    
-chat    
-messaging   
-css 
-registeri tühjad inputid kontrolli alla saada   
+ez to do: postitamise lahter!, registeri tühjad inputid kontrolli alla saada   
+
+mid to do: postituse avamine, comments    
+
+advanced: chat, messaging       
+
+
+later: css  
 
 
 hiljem, kui aega ja igav on: 

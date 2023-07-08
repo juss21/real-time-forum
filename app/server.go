@@ -24,8 +24,8 @@ func StartServer(port string) {
 	http.HandleFunc("/logout-attempt", LogoutHandler)
 	http.HandleFunc("/register-attempt", RegisterHandler)
 	http.HandleFunc("/hasCookie", HasCookieHandler)
-	http.HandleFunc("/get-posts", PostsHandler)
-	http.HandleFunc("/get-users", sendUserList)
+	http.HandleFunc("/get-posts", SendPostList)
+	http.HandleFunc("/get-users", SendUserList)
 
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }

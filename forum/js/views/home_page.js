@@ -1,7 +1,7 @@
 import { hasSession } from "../helpers.js";
 import { navigateTo } from "./router.js";
-import { createUserList, fetchUsers } from "./messenger.js";
-import { postHtml } from "./home_data.js";
+import {  fetchUsers } from "./messenger.js";
+import {  fetchPosts } from "./home_data.js";
 
 export default async function () {
     const isAuthenticated = await hasSession()
@@ -28,7 +28,7 @@ export default async function () {
             <div id="posts"></div>
             <div id="messageBox"></div>
         `
-        postHtml("posts")
+        fetchPosts("posts")
         fetchUsers("messageBox");
     }
 }

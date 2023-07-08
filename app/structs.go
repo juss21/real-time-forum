@@ -2,7 +2,7 @@ package app
 
 import "database/sql"
 
-type User struct {
+type UserResponse struct {
 	UserID   int
 	UserName string
 }
@@ -44,4 +44,14 @@ type RegisterInfo struct {
 	LastName  string `json:"register_lname"`
 	Email     string `json:"register_mail"`
 	Password  string `json:"register_passwd"`
+}
+
+// post info that will be fetched from js
+type PostResponse struct {
+	PostID           int
+	OriginalPosterID int
+	OriginalPoster   string
+	Title            string
+	Content          string
+	//CategoryID       int
 }
