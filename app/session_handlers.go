@@ -13,7 +13,6 @@ import (
 
 func getUserId(loginInput string) (userId int) {
 	DataBase.QueryRow("SELECT id FROM users WHERE username = ? OR email = ?", loginInput, loginInput).Scan(&userId)
-
 	return userId
 }
 
@@ -167,5 +166,29 @@ func SaveSession(key string, userId int) {
 	_, err := statement.Exec(key, userId)
 	if err != nil {
 		fmt.Println("one per user")
+	}
+}
+
+
+
+
+func getAllUsers() (users []User) {
+	rows, _ := DataBase.Query("SELECT id, username FROM users")
+	defer rows.Close()
+	for rows.Next() {
+		var user User
+		rows.Scan(&user.UserID, &user.UserName)
+		users = append(users, user)
+	}
+	return
+}
+
+func sendUserList(w http.ResponseWriter, r *http.Request) {
+	userList := getAllUsers()
+	w.WriteHeader(http.StatusOK)
+	err := json.NewEncoder(w).Encode(userList)
+	if err != nil {
+		log.Println(err)
+		return
 	}
 }

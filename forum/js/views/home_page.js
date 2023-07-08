@@ -1,15 +1,12 @@
 import { hasSession } from "../helpers.js";
 import { navigateTo } from "./router.js";
+import { createUserList, fetchUsers } from "./messenger.js";
 
 export default async function () {
     const isAuthenticated = await hasSession()
 
-    await loadPosts()
-
-    if (!isAuthenticated) {
-        navigateTo("/login")
-        return
-    } else {
+    if (isAuthenticated) {
+       // await loadPosts()
         let currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
         document.title = "Home"
@@ -24,14 +21,15 @@ export default async function () {
         <div id="home">
                 <h1>Welcome to our forum, ${currentUser.LoginName}!</h1>
             </div>
+            <div id="messageBox"></div>
         `
-
+        fetchUsers();
     }
 }
 
 async function loadPosts() {
     try {
-        url = "/get-posts"
+        let url = "/get-posts"
         response = await fetch(url)
         loadPostsResponse(response)
     } catch (e) {
@@ -39,6 +37,7 @@ async function loadPosts() {
         return
     }
 }
+
 function loadPostsResponse(response) {
     if (response.ok) {
 

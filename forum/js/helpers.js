@@ -1,3 +1,5 @@
+import { navigateTo } from "./views/router.js"
+
 export async function hasSession() {
     if (localStorage.getItem("currentUser")) {
         let currentUser = JSON.parse(localStorage.getItem("currentUser"))
@@ -8,6 +10,7 @@ export async function hasSession() {
             localStorage.removeItem("currentUser")
         }
     }
+    navigateTo("/login")
     return false
 }
 

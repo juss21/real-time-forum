@@ -2,6 +2,11 @@ package app
 
 import "database/sql"
 
+type User struct {
+	UserID   int
+	UserName string
+}
+
 // information that will be pushed in to the site
 type CurrentUser struct {
 	UserID     int
