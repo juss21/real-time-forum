@@ -23,6 +23,10 @@ export async function router() {
         {
             path: "/logout",
             view: logout_page
+        },
+        {
+            path: "/register",
+            view: register_page
         }
     ]
 

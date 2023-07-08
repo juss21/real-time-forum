@@ -75,6 +75,54 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Attempting to register")
+
+	var registerInfo RegisterInfo
+	err := json.NewDecoder(r.Body).Decode(&registerInfo)
+	errorHandler(err)
+
+	var nicknameB, emailB bool
+
+	err1 := DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(username) = lower(?))", registerInfo.Username).Scan(&nicknameB)
+	err2 := DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(email) = lower(?))", registerInfo.Email).Scan(&emailB)
+
+	fmt.Println(nicknameB, emailB)
+
+	if err1 == nil && err2 == nil {
+		if emailB || nicknameB {
+			responseMessage := ""
+			if emailB {
+				responseMessage = "email"
+			}
+			if nicknameB {
+				responseMessage = "name"
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Bad register attempt!" + responseMessage))
+			return
+		} else {
+			row, err := DataBase.Prepare("INSERT INTO users (username, password, email, age, gender, firstname, lastname) VALUES (?, ?, ?, ?, ?, ?, ?)")
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			_, erro := row.Exec(registerInfo.Username, registerInfo.Password, registerInfo.Email, registerInfo.Age, registerInfo.Gender, registerInfo.FirstName, registerInfo.LastName)
+			if erro != nil {
+				log.Println(erro)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Registration was successful!"))
+		}
+	} else {
+		log.Println(err1)
+		log.Println(err2)
+		return
+	}
+}
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Attempting to log out")

@@ -16,7 +16,7 @@ export async function hasCookie(cookie) {
     try {
         const url = `/hasCookie?CookieKey=${cookie.CookieKey}&UserID=${cookie.UserID}`
         
-        await new Promise(resolve => setTimeout(resolve, 50));
+        //await new Promise(resolve => setTimeout(resolve, 50));
 
         const response = await fetch(url)
         

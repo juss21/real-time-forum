@@ -41,4 +41,14 @@ type LoginInfo struct {
 	Password string `json:"login_pw"`
 }
 
+type RegisterInfo struct {
+	Username  string `json:"register_nickname"`
+	Age       string `json:"register_age"`
+	Gender    string `json:"register_gender"`
+	FirstName string `json:"register_fname"`
+	LastName  string `json:"register_lname"`
+	Email     string `json:"register_mail"`
+	Password  string `json:"register_passwd"`
+}
+
 var DataBase *sql.DB
