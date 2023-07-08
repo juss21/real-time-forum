@@ -20,6 +20,7 @@ func StartServer(port string) {
 	http.HandleFunc("/logout-attempt", LogoutHandler)
 	http.HandleFunc("/register-attempt", RegisterHandler)
 	http.HandleFunc("/hasCookie", HasCookieHandler)
+	http.HandleFunc("/get-posts", PostsHandler)
 
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }
