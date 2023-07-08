@@ -8,6 +8,8 @@ import (
 
 func StartServer(port string) {
 
+	SessionCleanup() // sessions table cleanup
+
 	fs := noDirListing(http.FileServer(http.Dir("./forum/"))) //nodirlisting to avoid guest seeing all files stored in /web/images/
 
 	log.Printf("Starting server at port " + port + "\n\n")
@@ -15,14 +17,15 @@ func StartServer(port string) {
 
 	http.Handle("/forum/", http.StripPrefix("/forum", fs)) // handling forum folder
 	http.HandleFunc("/ws", wsEndpoint)
-	http.HandleFunc("/", HomePageHandler)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./forum/index.html")
+	})
 	http.HandleFunc("/login-attempt", LoginHandler)
 	http.HandleFunc("/logout-attempt", LogoutHandler)
 	http.HandleFunc("/register-attempt", RegisterHandler)
 	http.HandleFunc("/hasCookie", HasCookieHandler)
 	http.HandleFunc("/get-posts", PostsHandler)
 	http.HandleFunc("/get-users", sendUserList)
-
 
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }

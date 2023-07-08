@@ -1,3 +1,4 @@
+// everything related to login/logout, sessions...
 package app
 
 import (
@@ -59,7 +60,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// on success
 	log.Println("Login was successful!")
 
-	response := loginMessage{
+	response := LoginResponse{
 		LoginName: loginInfo.Login,
 		UserID:    getUserId(loginInfo.Login),
 		CookieKey: createCookie(w, loginInfo.Login),
@@ -166,29 +167,5 @@ func SaveSession(key string, userId int) {
 	_, err := statement.Exec(key, userId)
 	if err != nil {
 		fmt.Println("one per user")
-	}
-}
-
-
-
-
-func getAllUsers() (users []User) {
-	rows, _ := DataBase.Query("SELECT id, username FROM users")
-	defer rows.Close()
-	for rows.Next() {
-		var user User
-		rows.Scan(&user.UserID, &user.UserName)
-		users = append(users, user)
-	}
-	return
-}
-
-func sendUserList(w http.ResponseWriter, r *http.Request) {
-	userList := getAllUsers()
-	w.WriteHeader(http.StatusOK)
-	err := json.NewEncoder(w).Encode(userList)
-	if err != nil {
-		log.Println(err)
-		return
 	}
 }

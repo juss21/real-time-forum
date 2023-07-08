@@ -14,3 +14,7 @@ func InitDatabase() {
 	fmt.Println("ok")
 	DataBase.Exec(string(file))
 }
+
+func SessionCleanup() {
+	DataBase.Exec("DELETE FROM session")
+}

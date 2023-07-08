@@ -3,18 +3,23 @@ export default function () {
     document.title = "Login"
 
     document.getElementById("app").innerHTML = `
-    <form id="loginForm" action="javascript:" method="POST">
-
-        <input type="text" placeholder="Username" name="login_id" id="login_id">
-        <input type="password" placeholder="Password" name="login_pw" id="login_pw">
-        <button type="submit" class="button">login!</button>
-
+    <form id="loginForm" action="javascript:" method="POST" class="home">
     <br>
-    <a id="ErrorBox"></a>
-    </form>
+    <h1>Login page</h1>    
+    <br>
+        <input type="text" placeholder="Username" name="login_id" id="login_id"><br><br>
+        <input type="password" placeholder="Password" name="login_pw" id="login_pw"><br>
+        <br>
+        <a id="ErrorBox"></a>
+        <br>
+        <br>
+        <button type="submit" class="button">Sign in!</button>
+        <br>
+    <br>
 
 
     <a href="/register" class="nav__link" [data-link]="">Create a new account!</a>
+    </form>
     `;
 
     loginListener()

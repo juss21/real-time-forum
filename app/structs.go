@@ -7,6 +7,8 @@ type User struct {
 	UserName string
 }
 
+var DataBase *sql.DB
+
 // information that will be pushed in to the site
 type CurrentUser struct {
 	UserID     int
@@ -15,37 +17,25 @@ type CurrentUser struct {
 	Rank       string
 }
 
-type Forum struct {
-	Loggedin    bool
-	LoggedUser  CurrentUser
-	ErrorMsg    string
-	ErrorsFound bool
-}
-
-var PageData Forum
-
-type loginMessage struct {
-	LoginName string
+type CookieResponse struct {
 	UserID    int
 	CookieKey string
 }
 
-type cookieResponse struct {
-	UserID    int
-	CookieKey string
-}
-
-type sessionInfo struct {
-	Name    string `json:"session-id"`
-	Value   string
-	Expires string
-}
-
+// login info that will be fetched from js
 type LoginInfo struct {
 	Login    string `json:"login_id"`
 	Password string `json:"login_pw"`
 }
 
+// response that will be sent back to js
+type LoginResponse struct {
+	LoginName string
+	UserID    int
+	CookieKey string
+}
+
+// register info that will be fetched from js
 type RegisterInfo struct {
 	Username  string `json:"register_nickname"`
 	Age       string `json:"register_age"`
@@ -55,5 +45,3 @@ type RegisterInfo struct {
 	Email     string `json:"register_mail"`
 	Password  string `json:"register_passwd"`
 }
-
-var DataBase *sql.DB

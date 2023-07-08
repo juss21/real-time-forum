@@ -1,23 +1,23 @@
-export function createUserList(userData) {
-    const messageBox = document.getElementById("messageBox");
-    messageBox.innerHTML = "";
+export function createUserList(id, userData) {
+    const element = document.getElementById(id);
+    element.innerHTML = "";
 
     for (let i = 0; i < userData.length; i++) {
         const userName = userData[i].UserName;
         const userNameElement = document.createElement("div");
         userNameElement.textContent = userName;
-        messageBox.appendChild(userNameElement);
+        element.appendChild(userNameElement);
     }
 }
 
-export async function fetchUsers() {
+export async function fetchUsers(id) {
     try {
         const url = "/get-users";
         const response = await fetch(url);
 
         if (response.ok) {
             let data = await response.json();
-            createUserList(data)
+            createUserList(id, data)
         } else {
             console.log("Failed to fetch user data.");
         }

@@ -1,6 +1,7 @@
 import { hasSession } from "../helpers.js";
 import { navigateTo } from "./router.js";
 import { createUserList, fetchUsers } from "./messenger.js";
+import { postHtml } from "./home_data.js";
 
 export default async function () {
     const isAuthenticated = await hasSession()
@@ -10,20 +11,25 @@ export default async function () {
         let currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
         document.title = "Home"
-
+        let online = 5
         document.getElementById("app").innerHTML = `
 
         <nav class="nav">
+        <a class="nav__link">${online}👥</a>
+        <a class="nav__link">Welcome, ${currentUser.LoginName}!</a>
         <a href="/" class="nav__link" data-link>Home</a>
-        <a href="/login" class="nav__link" data-link>Login</a>
         <a href="/logout" class="nav__link" data-link>Logout</a>
-    </nav>
-        <div id="home">
-                <h1>Welcome to our forum, ${currentUser.LoginName}!</h1>
+         </nav>
+        <div id="home" class="home">
+                <h1>Our forum!</h1>
             </div>
+
+
+            <div id="posts"></div>
             <div id="messageBox"></div>
         `
-        fetchUsers();
+        postHtml("posts")
+        fetchUsers("messageBox");
     }
 }
 
@@ -43,47 +49,5 @@ function loadPostsResponse(response) {
 
     } else {
 
-    }
-}
-
-function loginListener(){
-    let loginForm = document.getElementById("loginForm")
-    let loginData = {}
-    
-    loginForm.addEventListener("submit", async (e) =>{
-        e.preventDefault()
-        
-        var formData = new FormData(loginForm)
-
-        for (var [key, value] of formData.entries()){
-            loginData[key] = value
-        }
-
-        const options = {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(loginData)
-        }
-
-        try {
-            let response = await fetch("/login-attempt", options)
-            loginResponse(response)
-        } catch  (e){
-            console.error(e)
-        }
-    })
-}
-
-async function loginResponse(response){
-    if (response.ok){
-        let data = await response.json()
-        localStorage.setItem("currentUser", JSON.stringify(data))
-        navigateTo("/") 
-//        window.location.href = "/" 
-    } else {
-        let message = await response.text()
-        document.getElementById("ErrorBox").innerHTML = message.replace()
     }
 }

@@ -5,21 +5,28 @@ export default function () {
     document.title = "Register"
 
     document.getElementById("app").innerHTML = `
-            <form id="registerForm" method="POST">
-                <input type="text" placeholder="Nickname" name="register_nickname" id="register_nickname">
-                <input type="text" placeholder="Age" name="register_age" id="register_age">
-                <input type="text" placeholder="Gender" name="register_gender" id="register_gender">
-                <input type="text" placeholder="First Name" name="register_fname" id="register_fname">
-                <input type="text" placeholder="Last Name" name="register_lname" id="register_lname">
-                <input type="text" placeholder="E-mail" name="register_mail" id="register_mail">
-                <input type="password" placeholder="Password" name="register_passwd" id="register_passwd">
-                <button type="submit" class="button">Submit!</button>
-
-            </form>
-            <a id="ErrorBox"></a>
-
+            <form id="registerForm" method="POST" class="home">
+            <br>
+            <h1>Registration page</h1>    
+            <br>
+                <input type="text" placeholder="Nickname" name="register_nickname" id="register_nickname"><br>
+                <input type="text" placeholder="Age" name="register_age" id="register_age"><br>
+                <input type="text" placeholder="Gender" name="register_gender" id="register_gender"><br>
+                <input type="text" placeholder="First Name" name="register_fname" id="register_fname"><br>
+                <input type="text" placeholder="Last Name" name="register_lname" id="register_lname"><br>
+                <br>
+                <input type="text" placeholder="E-mail" name="register_mail" id="register_mail"><br>
+                <input type="password" placeholder="Password" name="register_passwd" id="register_passwd"><br>
+                <br>
+                <a id="ErrorBox"> </a>
+                <br><br>
+                <button type="submit" class="button">Register!</button>
+                <br>
+                <br>
 
             <a href="/login" class="nav__link" [data-link]="">Already have an account?</a>
+            </form>
+            
 
     `
 
