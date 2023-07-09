@@ -10,25 +10,32 @@ export function createPostHtml(id, data) {
 
         const post = document.createElement("a")
         post.id = `post-${data[i].PostID}`
-        post.href = `/get-comments?PostID=${data[i].PostID}`
+        //post.href = `/get-comments?PostID=${data[i].PostID}`
 
         const datePosted = document.createElement("div")
         datePosted.className = "datePosted"
+        datePosted.id = `post-${data[i].PostID}`
+
         datePosted.innerHTML = `${data[i].Date}`
         post.appendChild(datePosted)
 
         const category = document.createElement("div")
         category.className = "postCategory"
+        category.id = `post-${data[i].PostID}`
+
         category.innerHTML = `${data[i].Category}`
         post.appendChild(category)
 
         const title = document.createElement("div")
         title.className = "postTitle"
+        title.id = `post-${data[i].PostID}`
+
         title.innerHTML = `${data[i].Title}`
         post.appendChild(title)
 
         const op = document.createElement("div")
         op.className = "originalPoster"
+        op.id = `post-${data[i].PostID}`
         op.innerHTML = `Posted by: ${data[i].OriginalPoster}`
         post.appendChild(op)
 
@@ -43,7 +50,8 @@ export function createPostHtml(id, data) {
 
 function handlePostClick(event) {
     // Check if the clicked element has the "post" class
-    if (event.target.classList.contains("post")) {
+    const target = event.target
+    if (target.id.includes("post-")) {
         event.preventDefault(); // Prevent the default link behavior
 
         const postId = event.target.id.replace("post-", "")
@@ -74,7 +82,7 @@ async function fetchComments(postId) {
         if (response.ok) {
             let data = await response.json();
             // Process the fetched comments data
-            console.log(data)
+            // console.log(data)
             openPost(postId, data)
         } else {
             console.log("Failed to fetch comments data.");
@@ -87,18 +95,91 @@ async function fetchComments(postId) {
 
 function openPost(postId, data) {
     let element = document.getElementById("openedPost")
-    element.innerHTML = ""
+    element.style.display = "inline"
     element.className = `post-${postId}`
-    for (let i = 0; i < data.length; i++) {
-        let comment = document.createElement("div")
-        let poster = document.createElement("h3")
-        let date = document.createElement("p")
-        poster.innerHTML = data[i].OriginalPoster
-        comment.innerHTML = data[i].Content
-        date.innerHTML = data[i].Date
 
-        comment.appendChild(poster)
-        comment.appendChild(date)
-        element.appendChild(comment)
+
+    for (let i = 0; i < data.length; i++) {
+        // let title = document.getElementById("openedPostTitle")
+        // let content = document.getElementById("openedPostContent")
+        // let owner = document.getElementById("openedPostOriginalPoster")
+        // let date = document.getElementById("openedPostDate")
+
+        createComment(data[i].Content ,data[i].OriginalPoster, data[i].Date)
+        // comment.appendChild(poster)
+        // comment.appendChild(date)
+        // element.appendChild(comment)
     }
 }
+
+function createComment(commentContent ,commentOP, commentDate) {
+    let commentSection = document.getElementById("openedPostCommentSection")
+
+    let commentBody = document.createElement("div")
+    commentBody.id = "openedPostComment"
+    
+    // left side (avatar/user/date)
+    let commentAvatarBody = document.createElement("div")
+    commentAvatarBody.id = "openedPostCommentAvatar"
+
+    let avatar = document.createElement("img")
+    avatar.src = "/forum/images/avatarTemplate.png"
+    avatar.id = "profilepic"
+
+    let div = document.createElement("div")
+    let commentor = document.createElement("div")
+    commentor.id = "openedPostCommentOP"
+    commentor.innerHTML = commentOP
+    let comment_date = document.createElement("div")
+    comment_date.id = "openedPostCommentDate"
+    comment_date.innerHTML = commentDate
+    div.appendChild(commentor)
+    div.appendChild(comment_date)
+    commentAvatarBody.appendChild(avatar)
+
+    commentAvatarBody.appendChild(div)
+    commentBody.appendChild(commentAvatarBody)
+
+    let content = document.createElement("div")
+    content.id = "openedPostCommentContent"
+    content.innerHTML = commentContent
+    let content_div = document.createElement("div")
+    content.appendChild(content_div)
+
+    commentBody.appendChild(content)
+   
+    commentSection.appendChild(commentBody)
+
+/*
+           
+        </div>
+        <div id="openedPostCommentContent"><div>Content goes here</div></div>
+        </div>
+
+ */
+
+}
+
+/* 
+  <div id="openedPost" style="display:none"><button class="closePostBTN">X</button>
+        <div id="openedPostSection">
+        <div id="openedPostTitle">Pealkiri</div>
+        <div id="openedPostContent">siin on mingi sisue</div>
+        <div id="openedPostOriginalPoster">Madis</div>
+        <div id="openedPostDate">23 feb</div>
+        <div id="openedPostAvatar"><img id="profilepic" src="/forum/images/avatarTemplate.png"></div>
+        </div>
+        
+        <div id="openedPostCommentSection">
+            <div id="openedPostComment">
+            <div id="openedPostCommentAvatar">
+            <img id="profilepic" src="/forum/images/avatarTemplate.png">
+            <div>
+                <div id="openedPostCommentOP">Taat</div>
+                <div id="openedPostCommentDate">24 Feb</div>
+            </div>
+        </div>
+        <div id="openedPostCommentContent"><div>Content goes here</div></div>
+        </div>
+
+ */

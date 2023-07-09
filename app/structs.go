@@ -56,6 +56,7 @@ type PostResponse struct {
 	Category         string
 	Date             string
 }
+
 type CommentResponse struct {
 	CommentID        int
 	OriginalPoster   string
