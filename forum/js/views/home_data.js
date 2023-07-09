@@ -1,6 +1,6 @@
 export function createPostHtml(id, data) {
     let element = document.getElementById(id)
-    //element.innerHTML = ""
+    element.innerHTML = ""
 
     for (let i = 0; i < data.length; i++) {
         const post = document.createElement("div")
@@ -11,6 +11,7 @@ export function createPostHtml(id, data) {
         element.appendChild(document.createElement("br"))
     }
 }
+
 export async function fetchPosts(id) {
     try {
         const url = "/get-posts";

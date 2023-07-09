@@ -1,4 +1,16 @@
+let messageBox;
+
+export function openMessenger() {
+    fetchUsers("messageBox");
+    messageBox = document.getElementById("messageBox")
+    let openButton = document.getElementById("openButton")
+    openButton.style.display = "none";
+    messageBox.style.display = "block";
+}
+
+
 export function createUserList(id, userData) {
+
     const element = document.getElementById(id);
     element.innerHTML = "";
 
@@ -6,8 +18,23 @@ export function createUserList(id, userData) {
         const userName = userData[i].UserName;
         const userNameElement = document.createElement("div");
         userNameElement.textContent = userName;
-        element.appendChild(userNameElement);
+
+        element.appendChild(userNameElement)
     }
+
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "Close";
+    closeButton.type = "button";
+    closeButton.classList.add("btn");
+
+    closeButton.addEventListener("click", () => {
+        let openButton = document.getElementById("openButton")
+
+        element.style.display = "none";
+        openButton.style.display = "block";
+    });
+
+    element.appendChild(closeButton);
 }
 
 export async function fetchUsers(id) {

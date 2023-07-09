@@ -1,13 +1,14 @@
 import { hasSession } from "../helpers.js";
 import { navigateTo } from "./router.js";
-import {  fetchUsers } from "./messenger.js";
-import {  fetchPosts } from "./home_data.js";
+import { openMessenger } from "./messenger.js";
+import { fetchPosts } from "./home_data.js";
+
 
 export default async function () {
     const isAuthenticated = await hasSession()
 
     if (isAuthenticated) {
-       // await loadPosts()
+        // await loadPosts()
         let currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
         document.title = "Home"
@@ -22,14 +23,18 @@ export default async function () {
          </nav>
         <div id="home" class="home">
                 <h1>Our forum!</h1>
-            </div>
+        </div>
 
 
-            <div id="posts"></div>
-            <div id="messageBox"></div>
+        <div id="posts"></div>
+
+        <button class="open-button" id="openButton">Messenger</button>
+        <div id="messageBox" class="form-popup"></div>
         `
         fetchPosts("posts")
-        fetchUsers("messageBox");
+
+        const openButton = document.getElementById("openButton");
+        openButton.addEventListener("click", openMessenger);
     }
 }
 
