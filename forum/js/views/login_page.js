@@ -7,8 +7,8 @@ export default function () {
     <br>
     <h1>Login page</h1>    
     <br>
-        <input type="text" placeholder="Username" name="login_id" id="login_id"><br><br>
-        <input type="password" placeholder="Password" name="login_pw" id="login_pw"><br>
+        <input type="text" placeholder="Username" name="login_id" id="login_id" value="123"><br><br>
+        <input type="password" placeholder="Password" name="login_pw" id="login_pw" value="123"><br>
         <br>
         <a id="ErrorBox"></a>
         <br>

@@ -53,5 +53,14 @@ type PostResponse struct {
 	OriginalPoster   string
 	Title            string
 	Content          string
-	//CategoryID       int
+	Category         string
+	Date             string
+}
+type CommentResponse struct {
+	CommentID        int
+	OriginalPoster   string
+	OriginalPosterID int
+	PostID           int
+	Content          string
+	Date             string
 }

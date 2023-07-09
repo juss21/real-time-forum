@@ -28,6 +28,9 @@ export default async function () {
 
         <div id="posts"></div>
 
+        <br>
+        <div id="openedPost"></div>
+
         <button class="open-button" id="openButton">Messenger</button>
         <div id="messageBox" class="form-popup"></div>
         `
@@ -35,24 +38,5 @@ export default async function () {
 
         const openButton = document.getElementById("openButton");
         openButton.addEventListener("click", openMessenger);
-    }
-}
-
-async function loadPosts() {
-    try {
-        let url = "/get-posts"
-        response = await fetch(url)
-        loadPostsResponse(response)
-    } catch (e) {
-        console.error(e)
-        return
-    }
-}
-
-function loadPostsResponse(response) {
-    if (response.ok) {
-
-    } else {
-
     }
 }

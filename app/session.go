@@ -20,6 +20,10 @@ func getUserName(userId int) (UserName string) {
 	DataBase.QueryRow("SELECT username FROM users WHERE id = ?", userId).Scan(&UserName)
 	return UserName
 }
+func getCategoryFromID(id int) (category string) {
+	DataBase.QueryRow("SELECT name FROM category WHERE id = ?", id).Scan(&category)
+	return category
+}
 
 func createCookie(w http.ResponseWriter, loginInput string) string {
 	userid := getUserId(loginInput)

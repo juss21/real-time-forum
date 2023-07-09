@@ -26,7 +26,7 @@ func StartServer(port string) {
 	http.HandleFunc("/hasCookie", HasCookieHandler)
 	http.HandleFunc("/get-posts", SendPostList)
 	http.HandleFunc("/get-users", SendUserList)
-
+	http.HandleFunc("/get-comments", SendCommentList)
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }
 
