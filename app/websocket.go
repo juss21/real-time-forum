@@ -43,11 +43,7 @@ func wsReader(conn *websocket.Conn) {
 		}
 
 		var chatMessage ChatMessage
-        err = json.Unmarshal(message, &chatMessage)
-        if err != nil {
-            log.Println(err)
-            return
-        }
+
 		err = json.Unmarshal(message, &chatMessage)
 		errorHandler(err)
 
@@ -55,7 +51,8 @@ func wsReader(conn *websocket.Conn) {
 			log.Println(err)
 			return
 		}
-
+		
+		
 		log.Println("Received message:", string(message))
 	}
 }
