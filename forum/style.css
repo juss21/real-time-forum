@@ -160,13 +160,14 @@ body {
   top:50px;
   left: 120px;
   max-height: 300;
+  max-width: 90%;
+  word-wrap: break-word;
   text-align: justify;
 }
 
 #openedPostOriginalPoster {
   position: absolute;
   top: 100;
-
 }
 
 #openedPostDate {

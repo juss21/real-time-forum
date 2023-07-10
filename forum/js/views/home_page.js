@@ -53,9 +53,15 @@ export default async function () {
         const openButton = document.getElementById("openButton");
         openButton.addEventListener("click", openMessenger);
 
-         document.getElementById("postCloseBTN").addEventListener("click", ()=>{
-        document.getElementById("openedPost").style.display = "none";
-    })
+        document.getElementById("postCloseBTN").addEventListener("click", () => {
+            document.getElementById("openedPost").style.display = "none";
+        })
+
+        addEventListener("keyup", (e) => {
+            if (e.key === "Escape" && document.getElementById("openedPost").style.display !== "none") {
+                document.getElementById("openedPost").style.display = "none";
+            }
+        })
     }
 }
 
