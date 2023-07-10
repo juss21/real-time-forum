@@ -51,8 +51,26 @@ func wsReader(conn *websocket.Conn) {
 			log.Println(err)
 			return
 		}
-		
-		
-		log.Println("Received message:", string(message))
+
+
+		//parem systeem siia
+		SaveChat(chatMessage.ReceivingUser, chatMessage.UserName, chatMessage.MessageDate, chatMessage.Message)
+
+		returnData(chatMessage.ReceivingUser, chatMessage.UserName)
+
+		response := map[string]string{
+            "response_type":    "response",
+            "response_payload": "Received your message",
+        }
+        responseData, err := json.Marshal(response)
+        if err != nil {
+            log.Println(err)
+            return
+        }
+
+        if err := conn.WriteMessage(messageType, responseData); err != nil {
+            log.Println(err)
+            return
+        }
 	}
 }

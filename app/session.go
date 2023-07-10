@@ -177,3 +177,23 @@ func SaveSession(key string, userId int) {
 		fmt.Println("one per user")
 	}
 }
+
+func returnData(RecUser string, User string) {
+
+}
+
+func SaveChat(RecUser string, User string, DateSent string, Message string) {
+	
+	var userID, receiverID int
+	err := DataBase.QueryRow("SELECT id FROM users WHERE username = ?", User).Scan(&userID)
+	err3 := DataBase.QueryRow("SELECT id FROM users WHERE username = ?", RecUser).Scan(&receiverID)
+	if err != nil || err3 != nil {
+		log.Println(err, err3)
+	}
+
+	statement, _ := DataBase.Prepare("INSERT INTO chat (userid, receiverid, datesent, message) VALUES (?,?,?,?)")
+	_, err2 := statement.Exec(userID, receiverID, DateSent, Message)
+	if err2 != nil {
+		fmt.Println("Error saving message!!!")
+	}
+}

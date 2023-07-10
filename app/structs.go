@@ -73,7 +73,7 @@ type CommentResponseWPostData struct {
 
 type ChatMessage struct {
 	UserName      string `json:"userName"`
-	receivingUser string `json:"receivingUser"`
+	ReceivingUser string `json:"receivingUser"`
 	MessageDate   string `json:"messageDate"`
 	Message       string `json:"message"`
 }
