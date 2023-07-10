@@ -63,10 +63,10 @@ func SendPostList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAllComments(postId int) (comments []CommentResponse) {
+func getAllComments(postId int) (postData PostResponse, comments []CommentResponse) {
 	rows, err := DataBase.Query("SELECT id, userId, content, datecommented FROM comments WHERE postId = ?", postId)
 	if err != nil {
-		fmt.Println("Siin")
+		fmt.Println(err)
 		os.Exit(0)
 	}
 	defer rows.Close()
@@ -78,16 +78,34 @@ func getAllComments(postId int) (comments []CommentResponse) {
 		comment.OriginalPoster = getUserName(comment.OriginalPosterID)
 		comments = append(comments, comment)
 	}
-	return
+
+	row, erro := DataBase.Query("SELECT userId, title, content, categoryId, date FROM posts WHERE id = ?", postId)
+	if erro != nil {
+		fmt.Println(erro)
+		os.Exit(0)
+	}
+
+	for row.Next() {
+		row.Scan(&postData.OriginalPosterID, &postData.Title, &postData.Content, &postData.Category, &postData.Date)
+		postData.OriginalPoster = getUserName(postData.OriginalPosterID)
+	}
+
+	return postData, comments
 }
 
 func SendCommentList(w http.ResponseWriter, r *http.Request) {
 	log.Println("Comment send, request!")
 	postId, err := strconv.Atoi(r.URL.Query().Get("PostID"))
 	if err == nil {
-		comments := getAllComments(postId)
+		postData, comments := getAllComments(postId)
+
+		response := CommentResponseWPostData{
+			PostData: postData,
+			Comments: comments,
+		}
+
 		w.WriteHeader(http.StatusOK)
-		err := json.NewEncoder(w).Encode(comments)
+		err := json.NewEncoder(w).Encode(response)
 		if err != nil {
 			log.Println(err)
 			return

@@ -99,25 +99,37 @@ function openPost(postId, data) {
     element.className = `post-${postId}`
 
 
-    for (let i = 0; i < data.length; i++) {
-        // let title = document.getElementById("openedPostTitle")
-        // let content = document.getElementById("openedPostContent")
-        // let owner = document.getElementById("openedPostOriginalPoster")
-        // let date = document.getElementById("openedPostDate")
 
-        createComment(data[i].Content ,data[i].OriginalPoster, data[i].Date)
+    let title = document.getElementById("openedPostTitle")
+    title.innerHTML = data.postData.Title
+    let content = document.getElementById("openedPostContent")
+    content.innerHTML = data.postData.Content
+
+    let owner = document.getElementById("openedPostOriginalPoster")
+    owner.innerHTML = data.postData.OriginalPoster
+
+    let date = document.getElementById("openedPostDate")
+    date.innerHTML = data.postData.Date
+
+
+
+
+    for (let i = 0; i < data.comments.length; i++) {
+
+
+        createComment(data.comments[i].Content, data.comments[i].OriginalPoster, data.comments[i].Date)
         // comment.appendChild(poster)
         // comment.appendChild(date)
         // element.appendChild(comment)
     }
 }
 
-function createComment(commentContent ,commentOP, commentDate) {
+function createComment(commentContent, commentOP, commentDate) {
     let commentSection = document.getElementById("openedPostCommentSection")
 
     let commentBody = document.createElement("div")
     commentBody.id = "openedPostComment"
-    
+
     // left side (avatar/user/date)
     let commentAvatarBody = document.createElement("div")
     commentAvatarBody.id = "openedPostCommentAvatar"
@@ -147,16 +159,16 @@ function createComment(commentContent ,commentOP, commentDate) {
     content.appendChild(content_div)
 
     commentBody.appendChild(content)
-   
+
     commentSection.appendChild(commentBody)
 
-/*
-           
-        </div>
-        <div id="openedPostCommentContent"><div>Content goes here</div></div>
-        </div>
-
- */
+    /*
+               
+            </div>
+            <div id="openedPostCommentContent"><div>Content goes here</div></div>
+            </div>
+    
+     */
 
 }
 

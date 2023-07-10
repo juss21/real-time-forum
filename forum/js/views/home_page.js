@@ -29,26 +29,17 @@ export default async function () {
         <div id="posts"></div>
 
         <br>
-        <div id="openedPost" style="display:none"><button class="closePostBTN" id="postCloseBTN">X</button>
+        <div id="openedPost" style="display:none">
         <div id="openedPostSection">
         <div id="openedPostTitle">Pealkiri</div>
         <div id="openedPostContent">siin on mingi sisue</div>
         <div id="openedPostOriginalPoster">Madis</div>
         <div id="openedPostDate">23 feb</div>
         <div id="openedPostAvatar"><img id="profilepic" src="/forum/images/avatarTemplate.png"></div>
+        <button class="closePostBTN" id="postCloseBTN">X</button>
         </div>
         
-        <div id="openedPostCommentSection">
-            <div id="openedPostComment">
-            <div id="openedPostCommentAvatar">
-            <img id="profilepic" src="/forum/images/avatarTemplate.png">
-            <div>
-                <div id="openedPostCommentOP">Taat</div>
-                <div id="openedPostCommentDate">24 Feb</div>
-            </div>
-        </div>
-        <div id="openedPostCommentContent"><div>Content goes here</div></div>
-        </div>
+        <div id="openedPostCommentSection"></div>
 
 
         </div>

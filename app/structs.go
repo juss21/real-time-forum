@@ -65,3 +65,8 @@ type CommentResponse struct {
 	Content          string
 	Date             string
 }
+
+type CommentResponseWPostData struct {
+	PostData interface{} `json:"postData"`
+	Comments interface{} `json:"comments"`
+}
