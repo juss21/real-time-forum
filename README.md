@@ -7,8 +7,8 @@ todo:
 ez to do: postitamise lahter!, registeri tühjad inputid kontrolli alla saada   
 
 mid to do: postituste, commentite tegemine      
-    
-advanced: chat, messaging       
+
+advanced: chat, messaging, like&dislike       
 
 
 later: css  
