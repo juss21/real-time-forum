@@ -35,7 +35,7 @@ body {
   background-size: cover;
   min-height: 60px;
   max-height: 10%;
-
+  cursor: pointer;
   margin: 0 auto;
   width: 80%;
 }
@@ -272,6 +272,12 @@ body {
   height: 400px;
 }
 
+#chat {
+  height: 318px;
+  bottom: 82px;
+  width: 256px;
+  overflow: auto;
+}
 
 .form-popup .messageUsers {
   border: 1px;
@@ -299,19 +305,18 @@ body {
 }
 /* Add a red background color to the cancel button */
 .form-popup .cancel {
-  color: white;
-  padding: 5%;
   border: 1px;
   border-style: solid;
   border-color: black;
+  background-color: gray;
+  color: white;
   cursor: pointer;
   opacity: 0.8;
-  background-color: gray;
-  position: absolute;
-  left: -1;
-  width: 319px;
+  position: fixed;
+  bottom: 25px;
   height: 40px;
-  bottom: 0;
+  right: 30px;
+  width: 319px;
 }
 .form-popup .cancel:hover {
   background-color: red;
@@ -325,8 +330,4 @@ body {
   position: absolute;
   bottom: 40px;
   left: 0;
-}
-a, div{
-  cursor: pointer;
-  user-select: none;
 }

@@ -16,10 +16,3 @@ document.addEventListener("DOMContentLoaded", () => {
     router()
 })
 
-// const isAuthenticated = await hasSession()
-// if (isAuthenticated){
-//     wsAddConnection()
-// }
-
-
-

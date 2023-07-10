@@ -1,3 +1,6 @@
+import { sendData, wsAddConnection } from "../websocket.js";
+import { hasSession } from "../helpers.js";
+
 let messageBox;
 
 export function openMessenger() {
@@ -68,16 +71,78 @@ function createChat(messageBox, userName) {
     if (document.getElementById("chat")) {
         document.getElementById("chat").remove()
     }
+    if (!checkWsConnection()) checkWsConnection()
 
     const chat = document.createElement("div");
     chat.id = "chat";
 
-    const textArea = document.createElement("textarea")
+    chat.innerHTML
 
+    const textArea = document.createElement("textarea")
     textArea.id = "textBox"
     textArea.placeholder = `Send ${userName} a message!`;
+    textArea.maxLength = "10000"
+    textArea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage(userName);
+            return
+        }
+    });
 
     chat.appendChild(textArea)
 
     messageBox.appendChild(chat);
+}
+
+function formatDate(date) {
+    let options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+    };
+    const formattedDate = date.toLocaleString('en-US', options);
+    return formattedDate;
+}
+
+function sendMessage(receivingUser) {
+
+    const chatArea = document.getElementById('chat')
+    const textArea = document.getElementById('textBox')
+    const message = textArea.value.trimEnd().replace(/\n/g, "<br>")
+    if (message != "") {
+        const chatLog = document.createElement("div")
+        let currentDate = formatDate(new Date())
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+        let messageDate = formatDate(currentDate)
+        chatLog.innerHTML = `<span style='color: MediumBlue;'> ${currentUser.LoginName}</span> ` +
+            `<span style='color:rgb(192, 192, 192);'>${messageDate}</span>:<br>` + message;
+
+        const chatMessage = {
+            userName: currentUser.LoginName,
+            receivingUser: receivingUser,
+            messageDate: messageDate,
+            message: message
+        };
+        sendData(chatMessage)
+        chatArea.appendChild(chatLog)
+
+        textArea.value = "";
+        textArea.placeholder = `Send ${receivingUser} a message!`
+    }
+    chatArea.scrollTo(0, chatArea.scrollHeight)
+}
+
+async function checkWsConnection() {
+    const isAuthenticated = await hasSession()
+    if (isAuthenticated) {
+        wsAddConnection();
+        return true 
+    } else {
+        console.log("ERRRORRRR with ws!!!!")
+        return false
+    }
 }

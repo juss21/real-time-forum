@@ -2,7 +2,7 @@ import { hasSession } from "../helpers.js";
 import { navigateTo } from "./router.js";
 import { openMessenger } from "./messenger.js";
 import { fetchPosts } from "./home_data.js";
-
+import { wsAddConnection } from "../websocket.js";
 
 export default async function () {
     const isAuthenticated = await hasSession()

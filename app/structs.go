@@ -70,3 +70,10 @@ type CommentResponseWPostData struct {
 	PostData interface{} `json:"postData"`
 	Comments interface{} `json:"comments"`
 }
+
+type ChatMessage struct {
+	UserName      string `json:"userName"`
+	receivingUser string `json:"receivingUser"`
+	MessageDate   string `json:"messageDate"`
+	Message       string `json:"message"`
+}

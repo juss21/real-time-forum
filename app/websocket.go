@@ -42,13 +42,20 @@ func wsReader(conn *websocket.Conn) {
 			return
 		}
 
-		var jsonData map[string]string // json string map
-		err = json.Unmarshal(message, &jsonData)
+		var chatMessage ChatMessage
+        err = json.Unmarshal(message, &chatMessage)
+        if err != nil {
+            log.Println(err)
+            return
+        }
+		err = json.Unmarshal(message, &chatMessage)
 		errorHandler(err)
 
 		if err := conn.WriteMessage(messageType, message); err != nil {
 			log.Println(err)
 			return
 		}
+
+		log.Println("Received message:", string(message))
 	}
 }

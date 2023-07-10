@@ -1,3 +1,4 @@
+
 // WEBSOCKET
 export class Client {
     constructor(type, payload) {
@@ -5,23 +6,25 @@ export class Client {
         this.payload = payload
     }
 }
-
+let socket;
 
 export function wsAddConnection(){
     let currentUser = JSON.parse(localStorage.getItem("currentUser"))
-    let ws = new WebSocket(`ws://${document.location.host}/ws?UserID=${currentUser}`)
+    socket = new WebSocket(`ws://${document.location.host}/ws?UserID=${currentUser}`)
 
-    ws.onopen = () => {
+    socket.onopen = () => {
         console.log("WebSocket Connection established!")
     }
 
-    ws.onmessage = (e) => {
+    socket.onmessage = (e) => {
         console.log("Message recieved!")
     }
 
-    ws.onclose = (e) => {
+    socket.onclose = (e) => {
         console.log("WebSocket connection Lost!", e)
     }
+}
 
-    window.socket = ws
+export function sendData(data) {
+        socket.send(JSON.stringify(data));
 }
