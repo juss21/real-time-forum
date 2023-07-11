@@ -42,7 +42,7 @@ type RegisterInfo struct {
 	Gender    string `json:"register_gender"`
 	FirstName string `json:"register_fname"`
 	LastName  string `json:"register_lname"`
-	Email     string `json:"register_mail"`
+	Email     string `json:"register_email"`
 	Password  string `json:"register_passwd"`
 }
 

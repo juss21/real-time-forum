@@ -1,4 +1,4 @@
-import { sendData, wsAddConnection } from "../websocket.js";
+import { sendData, sendEvent, wsAddConnection } from "../websocket.js";
 import { hasSession } from "../helpers.js";
 
 let messageBox;
@@ -71,28 +71,44 @@ function createChat(messageBox, userName) {
     if (document.getElementById("chat")) {
         document.getElementById("chat").remove()
     }
-    if (!checkWsConnection()) checkWsConnection()
+    let wsConnection = checkWsConnection()
+    console.log("connection:", wsConnection)
+    if (wsConnection !== null) {
+        let currentDate = formatDate(new Date())
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+        let messageDate = formatDate(currentDate)
+
+        const chatResponse = {
+            userName: currentUser.LoginName,
+            receivingUser: userName,
+            messageDate: messageDate,
+            message: "message"
+        };
+        sendEvent("load_messages", chatResponse)
+    }
 
     const chat = document.createElement("div");
     chat.id = "chat";
 
     chat.innerHTML
-
+    
     const textArea = document.createElement("textarea")
     textArea.id = "textBox"
     textArea.placeholder = `Send ${userName} a message!`;
     textArea.maxLength = "10000"
     textArea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
+            console.log("enter!")
             sendMessage(userName);
             return
         }
     });
 
     chat.appendChild(textArea)
-
     messageBox.appendChild(chat);
+
+
 }
 
 function formatDate(date) {
@@ -127,7 +143,9 @@ function sendMessage(receivingUser) {
             messageDate: messageDate,
             message: message
         };
-        sendData(chatMessage)
+        //sendData(chatMessage)
+        sendEvent("send_message", chatMessage)
+
         chatArea.appendChild(chatLog)
 
         textArea.value = "";
@@ -136,13 +154,24 @@ function sendMessage(receivingUser) {
     chatArea.scrollTo(0, chatArea.scrollHeight)
 }
 
+// async function waitForWsConnection(wsConnection) {
+//     return new Promise((resolve) => {
+//         if (wsConnection.readyState === WebSocket.OPEN) {
+//             resolve();
+//         } else {
+//             wsConnection.addEventListener('open', () => {
+//                 resolve();
+//             });
+//         }
+//     });
+// }
+
 async function checkWsConnection() {
     const isAuthenticated = await hasSession()
     if (isAuthenticated) {
-        wsAddConnection();
-        return true 
+        return wsAddConnection();
     } else {
         console.log("ERRRORRRR with ws!!!!")
-        return false
+        return null
     }
 }

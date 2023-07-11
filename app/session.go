@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -91,11 +92,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	errorHandler(err)
 
 	var nicknameB, emailB bool
+	var passwordB = strings.TrimSpace(registerInfo.Password) == ""
 
 	err1 := DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(username) = lower(?))", registerInfo.Username).Scan(&nicknameB)
 	err2 := DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(email) = lower(?))", registerInfo.Email).Scan(&emailB)
-
-	fmt.Println(nicknameB, emailB)
 
 	if err1 == nil && err2 == nil {
 		if emailB || nicknameB {
@@ -106,8 +106,12 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			if nicknameB {
 				responseMessage = "name"
 			}
+			if passwordB {
+				responseMessage = "passwd"
+			}
+
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("Bad register attempt!" + responseMessage))
+			w.Write([]byte(registerInfo.Username + " " + registerInfo.Email + " " + "Bad register attempt! " + responseMessage))
 			return
 		} else {
 			row, err := DataBase.Prepare("INSERT INTO users (username, password, email, age, gender, firstname, lastname) VALUES (?, ?, ?, ?, ?, ?, ?)")
@@ -183,7 +187,7 @@ func returnData(RecUser string, User string) {
 }
 
 func SaveChat(RecUser string, User string, DateSent string, Message string) {
-	
+
 	var userID, receiverID int
 	err := DataBase.QueryRow("SELECT id FROM users WHERE username = ?", User).Scan(&userID)
 	err3 := DataBase.QueryRow("SELECT id FROM users WHERE username = ?", RecUser).Scan(&receiverID)

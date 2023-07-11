@@ -49,13 +49,13 @@ export function createPostHtml(id, data) {
 }
 
 function handlePostClick(event) {
-    // Check if the clicked element has the "post" class
+    // Check if the clicked element has the "post" id
     const target = event.target
     if (target.id.includes("post-")) {
-        event.preventDefault(); // Prevent the default link behavior
+        event.preventDefault() // Prevent the default link behavior
 
         const postId = event.target.id.replace("post-", "")
-        fetchComments(postId);
+        fetchComments(postId)
     }
 }
 
@@ -81,8 +81,6 @@ async function fetchComments(postId) {
 
         if (response.ok) {
             let data = await response.json();
-            // Process the fetched comments data
-            // console.log(data)
             openPost(postId, data)
         } else {
             console.log("Failed to fetch comments data.");

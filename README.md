@@ -4,15 +4,15 @@ README in progress...
     
 todo:   
 
-ez to do: postitamise lahter!, registeri tühjad inputid kontrolli alla saada   
+todo järk #1: real-time chat send/receive    
+todo järk #1: postituste/commentite tegemine    
+todo järk #2: like&dislike  
 
-mid to do: postituste, commentite tegemine      
+later: css      
+    
 
-advanced: chat, messaging, like&dislike       
-
-
-later: css  
-
+üle vaadata:
+done* registeri tühjad inputid kontrolli alla saada     
 
 hiljem, kui aega ja igav on: 
 fix: f5 refresh?    
