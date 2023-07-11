@@ -182,18 +182,38 @@ func SaveSession(key string, userId int) {
 	}
 }
 
-func returnData(RecUser string, User string) {
-
+func getUserIdFomMessage(User string) (userID int) {
+	DataBase.QueryRow("SELECT id FROM users WHERE username = ?", User).Scan(&userID)
+	return
 }
 
-func SaveChat(RecUser string, User string, DateSent string, Message string) {
+func LoadMessages(userID int, receiverID int) {
 
-	var userID, receiverID int
-	err := DataBase.QueryRow("SELECT id FROM users WHERE username = ?", User).Scan(&userID)
-	err3 := DataBase.QueryRow("SELECT id FROM users WHERE username = ?", RecUser).Scan(&receiverID)
-	if err != nil || err3 != nil {
-		log.Println(err, err3)
+	rows, err := DataBase.Query(`SELECT * FROM messages WHERE (userid = ? AND receiverid = ?) OR (receiverid = ? AND userid = ?) ORDER BY datesent DESC`, userID, receiverID)
+	if err != nil {
+		log.Println(err)
 	}
+	defer rows.Close()
+
+	for rows.Next() {
+	/*	var messageData ReturnMessageEvent
+		
+		type ReturnMessageEvent struct {
+			MessageId int `json:"messageId"`
+			SendMessageEvent
+			SentDate string `json:"sentDate"`
+		}
+
+		rows.Scan(&messageData.MessageId, &messageData.SenderId, &messageData.ReceiverId, &messageData.Message, &messageData.SentDate)
+		returnChatData.Messages = append(returnChatData.Messages, messageData)
+	}
+	reverseSlice(returnChatData.Messages)
+
+	return returnChatData */
+	}
+}
+
+func SaveChat(userID int, receiverID int, DateSent string, Message string) {
 
 	statement, _ := DataBase.Prepare("INSERT INTO chat (userid, receiverid, datesent, message) VALUES (?,?,?,?)")
 	_, err2 := statement.Exec(userID, receiverID, DateSent, Message)

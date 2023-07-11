@@ -9,6 +9,7 @@ export default async function () {
 
     if (isAuthenticated) {
         // await loadPosts()
+        wsAddConnection();
         let currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
         document.title = "Home"

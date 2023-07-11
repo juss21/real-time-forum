@@ -1,4 +1,4 @@
-import { sendData, sendEvent, wsAddConnection } from "../websocket.js";
+import { routeEvent, sendData } from "../websocket.js";
 import { hasSession } from "../helpers.js";
 
 let messageBox;
@@ -67,48 +67,39 @@ export async function fetchUsers(id) {
     }
 }
 
-function createChat(messageBox, userName) {
+function createChat(messageBox, receivingUser) {
     if (document.getElementById("chat")) {
         document.getElementById("chat").remove()
     }
-    let wsConnection = checkWsConnection()
-    console.log("connection:", wsConnection)
-    if (wsConnection !== null) {
-        let currentDate = formatDate(new Date())
-        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
-        let messageDate = formatDate(currentDate)
+    let currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
-        const chatResponse = {
+    const chatResponse = {
             userName: currentUser.LoginName,
-            receivingUser: userName,
-            messageDate: messageDate,
-            message: "message"
+            receivingUser: receivingUser,
+           // messageDate: messageDate,
+            message: "message",
+            type: "load_message"
         };
-        sendEvent("load_messages", chatResponse)
-    }
-
+    routeEvent(chatResponse)
     const chat = document.createElement("div");
     chat.id = "chat";
 
     chat.innerHTML
-    
+
     const textArea = document.createElement("textarea")
     textArea.id = "textBox"
-    textArea.placeholder = `Send ${userName} a message!`;
+    textArea.placeholder = `Send ${receivingUser} a message!`;
     textArea.maxLength = "10000"
     textArea.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
-            console.log("enter!")
-            sendMessage(userName);
+            sendMessage(receivingUser);
             return
         }
     });
 
     chat.appendChild(textArea)
     messageBox.appendChild(chat);
-
-
 }
 
 function formatDate(date) {
@@ -141,10 +132,11 @@ function sendMessage(receivingUser) {
             userName: currentUser.LoginName,
             receivingUser: receivingUser,
             messageDate: messageDate,
-            message: message
+            message: message,
+            type: "send_message"
         };
         //sendData(chatMessage)
-        sendEvent("send_message", chatMessage)
+        routeEvent(chatMessage)
 
         chatArea.appendChild(chatLog)
 
@@ -166,6 +158,8 @@ function sendMessage(receivingUser) {
 //     });
 // }
 
+
+/*
 async function checkWsConnection() {
     const isAuthenticated = await hasSession()
     if (isAuthenticated) {
@@ -174,4 +168,4 @@ async function checkWsConnection() {
         console.log("ERRRORRRR with ws!!!!")
         return null
     }
-}
+} */
