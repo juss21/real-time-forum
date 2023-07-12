@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 )
 
 func getAllUsers(r *http.Request) (users []UserResponse) {
@@ -114,4 +116,69 @@ func SendCommentList(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Bad attempt!"))
 	}
+}
+
+func AddPostHandler(w http.ResponseWriter, r *http.Request) {
+	var newPostInfo NewPostInfo
+	err := json.NewDecoder(r.Body).Decode(&newPostInfo)
+	errorHandler(err)
+
+	fmt.Println(newPostInfo)
+
+	userId := r.URL.Query().Get("UserID")
+
+	var emptyTitle = strings.TrimSpace(newPostInfo.Title) == ""
+	var emptyContent = strings.TrimSpace(newPostInfo.Content) == ""
+
+	if emptyTitle || emptyContent {
+		log.Println("Error creating a comment! Empty content!")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(newPostInfo.Title + " " + newPostInfo.Content))
+		return
+	} else {
+
+		statement, _ := DataBase.Prepare("INSERT INTO posts (userId, title, content, categoryId, date) VALUES (?,?,?,?,?)")
+
+		currentTime := time.Now().Format("02.01.2006 15:04")
+
+		_, erro := statement.Exec(userId, newPostInfo.Title, newPostInfo.Content, 2, currentTime)
+		if erro != nil {
+			fmt.Println("one per user")
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("TIPTOP!"))
+	}
+
+}
+func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
+	var newCommentInfo NewCommentInfo
+	err := json.NewDecoder(r.Body).Decode(&newCommentInfo)
+	errorHandler(err)
+
+	fmt.Println(newCommentInfo)
+
+	userId := r.URL.Query().Get("UserID")
+
+	var emptyContent = strings.TrimSpace(newCommentInfo.Content) == ""
+
+	if emptyContent {
+		log.Println("Error creating a comment! Empty content!")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(newCommentInfo.Content + " " + newCommentInfo.PostID))
+		return
+	} else {
+		statement, _ := DataBase.Prepare("INSERT INTO comments (userId, postId, content, datecommented) VALUES (?,?,?,?)")
+
+		currentTime := time.Now().Format("02.01.2006 15:04")
+
+		_, erro := statement.Exec(userId, newCommentInfo.PostID, newCommentInfo.Content, currentTime)
+		if erro != nil {
+			fmt.Println("one per user")
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("TIPTOP!"))
+	}
+
 }

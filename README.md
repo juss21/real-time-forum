@@ -4,9 +4,9 @@ README in progress...
     
 todo:   
 
-todo järk #1: real-time chat send/receive    
-todo järk #1: postituste/commentite tegemine    
-todo järk #2: like&dislike  
+todo järk #1: real-time chat send/receive        
+todo järk #1.5: like&dislike  
+todo järk #3: postituste/commentite tegemine -> vajab kõvasti lihvimist
 
 later: css      
     

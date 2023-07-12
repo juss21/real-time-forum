@@ -70,3 +70,14 @@ type CommentResponseWPostData struct {
 	PostData interface{} `json:"postData"`
 	Comments interface{} `json:"comments"`
 }
+
+type NewPostInfo struct {
+	Title      string `json:"post_title"`
+	Content    string `json:"post_content"`
+	Categories string `json:"post_categories"`
+}
+
+type NewCommentInfo struct {
+	PostID  string `json:"hiddenPostID"`
+	Content string `json:"comment_content"`
+}

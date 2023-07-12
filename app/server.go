@@ -27,6 +27,9 @@ func StartServer(port string) {
 	http.HandleFunc("/get-posts", SendPostList)
 	http.HandleFunc("/get-users", SendUserList)
 	http.HandleFunc("/get-comments", SendCommentList)
+	http.HandleFunc("/new-post", AddPostHandler)
+	http.HandleFunc("/new-comment", AddCommentHandler)
+
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }
 

@@ -196,20 +196,20 @@ func LoadMessages(userID int, receiverID int) {
 	defer rows.Close()
 
 	for rows.Next() {
-	/*	var messageData ReturnMessageEvent
-		
-		type ReturnMessageEvent struct {
-			MessageId int `json:"messageId"`
-			SendMessageEvent
-			SentDate string `json:"sentDate"`
-		}
+		/*	var messageData ReturnMessageEvent
 
-		rows.Scan(&messageData.MessageId, &messageData.SenderId, &messageData.ReceiverId, &messageData.Message, &messageData.SentDate)
-		returnChatData.Messages = append(returnChatData.Messages, messageData)
-	}
-	reverseSlice(returnChatData.Messages)
+				type ReturnMessageEvent struct {
+					MessageId int `json:"messageId"`
+					SendMessageEvent
+					SentDate string `json:"sentDate"`
+				}
 
-	return returnChatData */
+				rows.Scan(&messageData.MessageId, &messageData.SenderId, &messageData.ReceiverId, &messageData.Message, &messageData.SentDate)
+				returnChatData.Messages = append(returnChatData.Messages, messageData)
+			}
+			reverseSlice(returnChatData.Messages)
+
+			return returnChatData */
 	}
 }
 

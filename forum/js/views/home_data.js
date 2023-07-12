@@ -109,6 +109,8 @@ function openPost(postId, data) {
     let date = document.getElementById("openedPostDate")
     date.innerHTML = data.postData.Date
 
+    let PIDElement = document.getElementById("hiddenPostID")
+    PIDElement.value = postId
 
 
 
