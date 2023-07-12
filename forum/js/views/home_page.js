@@ -13,7 +13,7 @@ export default async function () {
         let currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
         document.title = "Home"
-        let online = 5
+        let online = 5 // IN PROGRESS...
         document.getElementById("app").innerHTML = `
 
         <nav class="nav">

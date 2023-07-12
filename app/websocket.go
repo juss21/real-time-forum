@@ -2,10 +2,10 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"regexp"
-	"github.com/gorilla/websocket"
 )
 
 //FUNction manager :)
@@ -29,7 +29,6 @@ func dataManager(data string, conn *websocket.Conn) {
 
 func decipherMessage(data string, conn *websocket.Conn) {
 	if string(data) != "undefined" {
-		//parem systeem siia
 		var chatMessage ChatMessage
 
 		err2 := json.Unmarshal([]byte(data), &chatMessage)
@@ -46,27 +45,33 @@ func decipherMessage(data string, conn *websocket.Conn) {
 		receivingID := getUserIdFomMessage(chatMessage.ReceivingUser)
 
 		SaveChat(userID, receivingID, chatMessage.MessageDate, chatMessage.Message)
-	} 
+	}
 }
 
 func sendMessage(data string, conn *websocket.Conn) {
- /*        response := map[string]string{
-            "response_type":    "response",
-            "response_payload": "Received your message",
-        }
-        responseData, err := json.Marshal(response)
-        if err != nil {
-            // Handle the error
-            log.Println(err)
-            return
-        }
 
-        if err := conn.WriteMessage(messageType, responseData); err != nil {
-            // Handle the error
-            log.Println(err)
-            return
-        }
-		*/
+	if string(data) != "undefined" {
+		var load LoadRequest
+
+		err2 := json.Unmarshal([]byte(data), &load)
+		if err2 != nil {
+			log.Println(err2)
+			return
+		}
+
+		returnChat := LoadMessages(load.UserName, load.ReceivingUser)
+
+		responseData, err :=json.Marshal(returnChat)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		if err := conn.WriteMessage(1, responseData); err != nil {
+			log.Println(err)
+			return
+		}
+		log.Println(string(responseData))
+	}
 }
 
 // WEBSOCKET

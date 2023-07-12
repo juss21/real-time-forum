@@ -1,4 +1,4 @@
-import { routeEvent, sendData } from "../websocket.js";
+import { routeEvent, loadChat } from "../websocket.js";
 import { hasSession } from "../helpers.js";
 
 let messageBox;
@@ -28,7 +28,8 @@ export function createUserList(id, userData) {
         userNameElement.className = "username"
 
         userNameElement.addEventListener("click", () => {
-            createChat(element, userName);
+            let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+            loadMessages(currentUser.LoginName, userName)
         });
         userList.appendChild(userNameElement)
     }
@@ -67,24 +68,30 @@ export async function fetchUsers(id) {
     }
 }
 
-function createChat(messageBox, receivingUser) {
+
+export function loadMessages(senderUser, receivingUser) {
+const chatResponse = {
+        userName: senderUser,
+        receivingUser: receivingUser,
+        type: "load_message"
+    };
+    loadChat(chatResponse)
+}
+
+
+export function createChat(receivingUser, previousMessages) {
     if (document.getElementById("chat")) {
         document.getElementById("chat").remove()
     }
-    let currentUser = JSON.parse(localStorage.getItem("currentUser"))
-
-    const chatResponse = {
-            userName: currentUser.LoginName,
-            receivingUser: receivingUser,
-           // messageDate: messageDate,
-            message: "message",
-            type: "load_message"
-        };
-    routeEvent(chatResponse)
+    
     const chat = document.createElement("div");
     chat.id = "chat";
-
-    chat.innerHTML
+    previousMessages.forEach((message) => {
+        const chatLog = document.createElement("div")
+        chatLog.innerHTML = `<span style='color: MediumBlue;'> ${message.UserName}</span> ` +
+        `<span style='color:rgb(192, 192, 192);'>${message.MessageDate}</span>:<br>` + message.Message;
+        chat.appendChild(chatLog);
+      });
 
     const textArea = document.createElement("textarea")
     textArea.id = "textBox"
@@ -97,6 +104,7 @@ function createChat(messageBox, receivingUser) {
             return
         }
     });
+    const messageBox = document.getElementById('messageBox');
 
     chat.appendChild(textArea)
     messageBox.appendChild(chat);
@@ -135,7 +143,6 @@ function sendMessage(receivingUser) {
             message: message,
             type: "send_message"
         };
-        //sendData(chatMessage)
         routeEvent(chatMessage)
 
         chatArea.appendChild(chatLog)
@@ -145,27 +152,3 @@ function sendMessage(receivingUser) {
     }
     chatArea.scrollTo(0, chatArea.scrollHeight)
 }
-
-// async function waitForWsConnection(wsConnection) {
-//     return new Promise((resolve) => {
-//         if (wsConnection.readyState === WebSocket.OPEN) {
-//             resolve();
-//         } else {
-//             wsConnection.addEventListener('open', () => {
-//                 resolve();
-//             });
-//         }
-//     });
-// }
-
-
-/*
-async function checkWsConnection() {
-    const isAuthenticated = await hasSession()
-    if (isAuthenticated) {
-        return wsAddConnection();
-    } else {
-        console.log("ERRRORRRR with ws!!!!")
-        return null
-    }
-} */

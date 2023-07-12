@@ -1,4 +1,5 @@
 // WEBSOCKET
+import { createChat } from "./views/messenger.js"
 
 export function wsAddConnection() {
     let currentUser = JSON.parse(localStorage.getItem("currentUser"))
@@ -10,6 +11,7 @@ export function wsAddConnection() {
 
     socket.onmessage = (e) => {
         if (e.data) {
+            console.log(e.data)
             routeEvent(e.data);
         } else {
             console.log("Cannot send undefined data");
@@ -26,19 +28,25 @@ export function wsAddConnection() {
 
 const functionMap = { //USAGE: functionMap["send_message"]();
     "send_message": sendData,
-    "load_message": loadData,
+    "load_message": loadChat,
 };
 
-export function routeEvent(data) {
-    console.log("routeEvent data: ", data)
+export async function routeEvent(data) {
     if (data.type === undefined || !functionMap[data.type](data)) {
+        if (data) {
+            let messageInfo = JSON.parse(data)
+            createChat(messageInfo.ReceiverName, messageInfo.Messages)
+        }
         return
     }
     functionMap[data.type](data);
+    //socket.send(JSON.stringify(data))
 }
 
-function loadData() {
-    console.log("Messages Loaded :)")
+export function loadChat(data) {
+    const jsonString = JSON.stringify(data);
+    socket.send(jsonString)
+
 }
 
 export function sendData(data) {
