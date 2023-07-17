@@ -1,4 +1,5 @@
 import { navigateTo } from "./router.js";
+import { wsAddConnection } from "../websocket.js";
 export default function () {    
     document.title = "Login"
 

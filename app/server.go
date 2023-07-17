@@ -8,15 +8,16 @@ import (
 
 func StartServer(port string) {
 
-	SessionCleanup() // sessions table cleanup
-
+	SessionCleanup()                                          // sessions table cleanup
+	wsManager := NewManager()                                 // websocket manager
 	fs := noDirListing(http.FileServer(http.Dir("./forum/"))) //nodirlisting to avoid guest seeing all files stored in /web/images/
 
 	log.Printf("Starting server at port " + port + "\n\n")
 	log.Printf("http://localhost:" + port + "/\n")
 
 	http.Handle("/forum/", http.StripPrefix("/forum", fs)) // handling forum folder
-	http.HandleFunc("/ws", wsEndpoint)
+
+	http.HandleFunc("/ws", wsManager.serveWs)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./forum/index.html")
 	})
@@ -27,6 +28,7 @@ func StartServer(port string) {
 	http.HandleFunc("/get-posts", SendPostList)
 	http.HandleFunc("/get-users", SendUserList)
 	http.HandleFunc("/get-comments", SendCommentList)
+	//http.HandleFunc("/get-active-users", SendActiveMembers)
 	http.HandleFunc("/new-post", AddPostHandler)
 	http.HandleFunc("/new-comment", AddCommentHandler)
 

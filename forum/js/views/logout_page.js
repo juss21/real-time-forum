@@ -1,5 +1,7 @@
 import { hasSession } from "../helpers.js"
+import { sendEvent } from "../websocket.js"
 import { navigateTo } from "./router.js"
+import { wsIsDisConnected } from "./home_page.js"
 
 export default async function () {
     if (hasSession()) {
@@ -11,7 +13,6 @@ export default async function () {
 }
 
 async function logoutAttempt(currentUser) {
-    window.location.href = "/login"
     try {
         let url = `/logout-attempt?UserID=${currentUser.UserID}`
         let response = await fetch(url)
@@ -26,7 +27,8 @@ function logoutResponse(response) {
     if (response.ok) {
         console.log("[Response] Logout succeeded!")
         localStorage.removeItem("currentUser")
-        //navigateTo("/login") 
+        navigateTo("/login") 
+        wsIsDisConnected()
     } else {
         console.log("logout failed!")
     }

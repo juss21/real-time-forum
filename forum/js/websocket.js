@@ -1,54 +1,99 @@
 // WEBSOCKET
+import { wsIsConnected } from "./views/home_page.js"
 import { createChat } from "./views/messenger.js"
 
+export class Event {
+    constructor(type, payload) {
+        this.type = type
+        this.payload = payload
+    }
+}
+
 export function wsAddConnection() {
-    let currentUser = JSON.parse(localStorage.getItem("currentUser"))
-    let socket = new WebSocket(`ws://${document.location.host}/ws?UserID=${currentUser}`)
+    if (window["WebSocket"]) {
+        wsIsConnected()
 
-    socket.onopen = () => {
-        console.log("WebSocket Connection established!")
-    }
+        if (window.socket) window.socket.close()
 
-    socket.onmessage = (e) => {
-        if (e.data) {
-            console.log(e.data)
-            routeEvent(e.data);
-        } else {
-            console.log("Cannot send undefined data");
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+        const ws = new WebSocket(`ws://${document.location.host}/ws?UserID=${currentUser.UserID}`)
+        
+
+
+        ws.onopen = () => {
+            console.log("WebSocket Connection established!")
         }
+
+        ws.onmessage = (e) => {
+            console.log("WebSocket Message attempt")
+            const eventData = JSON.parse(e.data)
+            const event = Object.assign(new Event, eventData)
+
+            routeEvent(event)
+        }
+
+        ws.onclose = (e) => {
+            console.log("WebSocket connection Lost!", e)
+        }
+
+        window.socket = ws
+
+        window.addEventListener('beforeunload', function() {
+            ws.close();
+        });
+    } else {
+        alert("This browser does not support websockets!")
     }
-
-    socket.onclose = (e) => {
-        console.log("WebSocket connection Lost!", e)
-    }
-
-    window.socket = socket
-
 }
 
 const functionMap = { //USAGE: functionMap["send_message"]();
     "send_message": sendData,
-    "load_message": loadChat,
+    "load_messages": loadChat,
+    "get_online_members": loadOnlineMembers,
 };
 
-export async function routeEvent(data) {
-    if (data.type === undefined || !functionMap[data.type](data)) {
-        if (data) {
-            let messageInfo = JSON.parse(data)
-            createChat(messageInfo.ReceiverName, messageInfo.Messages)
-        }
-        return
-    }
-    functionMap[data.type](data);
-    //socket.send(JSON.stringify(data))
+export function sendEvent(type, payload) {
+    const event = new Event(type, payload)
+
+    window.socket.send(JSON.stringify(event))
+    routeEvent(event)
+}
+
+export async function routeEvent(event) {
+    if (event.type === undefined) alert("Bad event!")
+    functionMap[event.type](event.payload)
+}
+
+
+export function loadOnlineMembers(data) {
+    const jsonString = JSON.stringify(data);
+    document.getElementById("onlineMembers").innerHTML = jsonString + "👥"
 }
 
 export function loadChat(data) {
-    const jsonString = JSON.stringify(data);
-    socket.send(jsonString)
-
+    // const jsonString = JSON.stringify(data);
+    console.log("messages:", data.Messages)
+    if (data.Messages === null || data.Messages === undefined) return
+    createChat(data.Messages.Receiving, data.Messages )
 }
 
 export function sendData(data) {
-    socket.send(JSON.stringify(data));
+    const jsonString = JSON.stringify(data);
+    // console.log("Sent:", jsonString)
+
+}
+
+export function waitForWSConnection(socket, cb) {
+    setTimeout(
+        function () {
+            if (socket && socket.readyState === 1) {
+                console.log("WebSocket is connected!")
+                if (cb != null) {
+                    cb()
+                }
+            } else {
+                console.log("Waiting for connection...")
+                waitForWSConnection(socket, cb)
+            }
+        }, 10);
 }

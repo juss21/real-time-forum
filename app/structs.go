@@ -7,6 +7,16 @@ type UserResponse struct {
 	UserName string
 }
 
+type UserStruct struct {
+	UserID   int
+	UserName string
+}
+
+type UsersOnlineResponse struct {
+	Userlist []UserStruct
+	Amount   int
+}
+
 var DataBase *sql.DB
 
 // information that will be pushed in to the site

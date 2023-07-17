@@ -2,6 +2,8 @@ export function createPostHtml(id, data) {
     let element = document.getElementById(id)
     element.innerHTML = ""
 
+
+
     for (let i = 0; i < data.length; i++) {
 
         const postDiv = document.createElement("div")
@@ -55,6 +57,8 @@ function handlePostClick(event) {
         event.preventDefault() // Prevent the default link behavior
 
         const postId = event.target.id.replace("post-", "")
+        // saving current postId at localstorage
+        localStorage.setItem("OpenedPostID", postId)
         fetchComments(postId)
     }
 }
@@ -65,6 +69,8 @@ export async function fetchPosts(id) {
         const response = await fetch(url);
         if (response.ok) {
             let data = await response.json();
+            console.log(response)
+
             createPostHtml(id, data)
         } else {
             console.log("Failed to fetch user data.");
@@ -74,7 +80,8 @@ export async function fetchPosts(id) {
     }
 }
 
-async function fetchComments(postId) {
+export async function fetchComments(postId) {
+    console.log("fetching comments for: ",postId)
     try {
         const url = `/get-comments?PostID=${postId}`;
         const response = await fetch(url);
@@ -109,11 +116,18 @@ function openPost(postId, data) {
     let date = document.getElementById("openedPostDate")
     date.innerHTML = data.postData.Date
 
+    let likes = document.getElementById("amountOfLikes")
+    likes.innerHTML = "5 👍"
+
+    let disLikes = document.getElementById("amountOfDisLikes")
+    disLikes.innerHTML = "👎 5"
+
     let PIDElement = document.getElementById("hiddenPostID")
     PIDElement.value = postId
 
 
-
+    let commentSection = document.getElementById("openedPostCommentSection")
+    commentSection.innerHTML = ""
     for (let i = 0; i < data.comments.length; i++) {
 
 

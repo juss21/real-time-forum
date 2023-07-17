@@ -1,23 +1,16 @@
 import { hasSession } from "../helpers.js";
 import { navigateTo } from "./router.js";
 import { openMessenger } from "./messenger.js";
-import { fetchPosts } from "./home_data.js";
+import { fetchComments, fetchPosts } from "./home_data.js";
+import { sendEvent } from "../websocket.js";
 import { wsAddConnection } from "../websocket.js";
+import { waitForWSConnection } from "../websocket.js";
 
-export default async function () {
-    const isAuthenticated = await hasSession()
-
-    if (isAuthenticated) {
-        // await loadPosts()
-        wsAddConnection();
-        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
-
-        document.title = "Home"
-        let online = 5 // IN PROGRESS...
-        document.getElementById("app").innerHTML = `
+function homeHTML(currentUser){
+    document.getElementById("app").innerHTML = `
 
         <nav class="nav">
-        <a class="nav__link">${online}👥</a>
+        <a class="nav__link" id="onlineMembers"></a>
         <a class="nav__link">Welcome, ${currentUser.LoginName}!</a>
         <a href="/" class="nav__link" data-link>Home</a>
         <a href="/logout" class="nav__link" data-link>Logout</a>
@@ -53,6 +46,9 @@ export default async function () {
         <div id="openedPostTitle">Pealkiri</div>
         <div id="openedPostContent">siin on mingi sisue</div>
         <div id="openedPostOriginalPoster">Madis</div>
+        <div id="openedPostLikes"><form id="addPostLike" action="javascript:" method="POST"><button type="submit" id="amountOfLikes">3</button></form></div>
+        <div id="openedPostDisLikes"><form id="addPostDisLike" action="javascript:" method="POST"><button type="submit" id="amountOfDisLikes">3</button></form></div>
+
         <div id="openedPostDate">23 feb</div>
         <div id="openedPostAvatar"><img id="profilepic" src="/forum/images/avatarTemplate.png"></div>
         <button class="closePostBTN" id="postCloseBTN">X</button>
@@ -81,6 +77,31 @@ export default async function () {
         <button class="open-button" id="openButton">Messenger</button>
         <div id="messageBox" class="form-popup"></div>
         `
+}
+
+let wsConnectionStatus = false
+
+export function wsIsConnected(){
+    wsConnectionStatus = true
+}
+export function wsIsDisConnected(){
+    wsConnectionStatus = false
+}
+
+export default async function () {
+
+    const isAuthenticated = await hasSession()
+    if (isAuthenticated) {
+        if (!wsConnectionStatus)  wsAddConnection()
+
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+
+        waitForWSConnection(window.socket, () => {
+            sendEvent("get_online_members", currentUser.UserID)        //getOnlineUsers()
+        })
+
+        homeHTML(currentUser)
+        document.title = "Home"
         fetchPosts("posts")
 
         const openButton = document.getElementById("openButton");
@@ -88,6 +109,7 @@ export default async function () {
 
         document.getElementById("postCloseBTN").addEventListener("click", () => {
             document.getElementById("openedPost").style.display = "none";
+            localStorage.removeItem("OpenedPostID")
         })
 
         document.getElementById("commentboxCloseBTN").addEventListener("click", () => {
@@ -122,6 +144,9 @@ export default async function () {
 
         newPostListener()
         newCommentListener()
+    } else {
+        navigateTo("/login")
+        return
     }
 }
 
@@ -152,7 +177,7 @@ function newPostListener() {
 
             try {
                 let response = await fetch(`/new-post?UserID=${currentUser.UserID}`, options)
-                if (response.ok){
+                if (response.ok) {
                     navigateTo("/")
                 }
             } catch (e) {
@@ -163,6 +188,7 @@ function newPostListener() {
         }
     })
 }
+
 
 function isValid() {
     if (document.getElementById("CreatePost_Error_Title").innerHTML === ""
@@ -194,16 +220,16 @@ function verifyFormNewPost() {
     }
 }
 
-function verifyFormNewComment(){
+function verifyFormNewComment() {
     let id = "newCommentBox"
     let element = document.getElementById(id)
     element.addEventListener("input", () => {
-        if (element.value.length < 4){
+        if (element.value.length < 4) {
             document.getElementById("CreateCommentError").innerHTML = "Comment is too short!"
         } else {
             document.getElementById("CreateCommentError").innerHTML = ""
         }
-    }) 
+    })
 }
 
 function newCommentListener() {
@@ -213,18 +239,18 @@ function newCommentListener() {
     verifyFormNewComment()
 
     section.addEventListener("submit", async (e) => {
-        if (document.getElementById("CreateCommentError").innerHTML === ""){
+        if (document.getElementById("CreateCommentError").innerHTML === "") {
             console.log("New comment attempt:", "succeeded!")
             let currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
             e.preventDefault()
-    
+
             var formData = new FormData(section)
-    
+
             for (var [key, value] of formData.entries()) {
                 form[key] = value
             }
-    
+
             const options = {
                 method: "POST",
                 headers: {
@@ -232,11 +258,13 @@ function newCommentListener() {
                 },
                 body: JSON.stringify(form)
             }
-    
+
             try {
                 let response = await fetch(`/new-comment?UserID=${currentUser.UserID}`, options)
-                if (response.ok){
+                if (response.ok) {
                     navigateTo("/")
+                    let postId = localStorage.getItem("OpenedPostID")
+                    fetchComments(postId)
                 }
                 // loginResponse(response)
             } catch (e) {
@@ -245,7 +273,7 @@ function newCommentListener() {
         } else {
             console.log("New comment attempt:", "failed!", "Too short of a comment!")
         }
-        
+
     })
 
 }

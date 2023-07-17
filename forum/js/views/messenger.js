@@ -1,4 +1,4 @@
-import { routeEvent, loadChat } from "../websocket.js";
+import { routeEvent, loadChat, sendEvent } from "../websocket.js";
 import { hasSession } from "../helpers.js";
 
 let messageBox;
@@ -73,8 +73,9 @@ export function loadMessages(senderUser, receivingUser) {
 const chatResponse = {
         userName: senderUser,
         receivingUser: receivingUser,
-        type: "load_message"
+        type: "load_messages"
     };
+    sendEvent("load_messages", chatResponse)
     loadChat(chatResponse)
 }
 
@@ -83,7 +84,7 @@ export function createChat(receivingUser, previousMessages) {
     if (document.getElementById("chat")) {
         document.getElementById("chat").remove()
     }
-    
+
     const chat = document.createElement("div");
     chat.id = "chat";
     previousMessages.forEach((message) => {

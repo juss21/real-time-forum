@@ -288,12 +288,22 @@ body {
   position: absolute;
   top: 100;
 }
-
+#openedPostLikes{
+  position: absolute;
+  top: 150;
+  margin: 0 auto;
+  background-color: rgba(0,0,0,0);
+}
+#openedPostDisLikes{
+  position: absolute;
+  top: 150;
+  left: 50;
+  margin: 0 auto;
+}
 #openedPostDate {
   position: absolute;
   top: 125;
   margin: 0 auto;
-
 }
 
 #openedPostCommentSection {
