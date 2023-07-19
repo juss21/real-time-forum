@@ -70,7 +70,8 @@ export async function fetchUsers(id) {
 
 
 export function loadMessages(senderUser, receivingUser) {
-const chatResponse = {
+    console.log("dataship:>",senderUser, receivingUser)
+    const chatResponse = {
         userName: senderUser,
         receivingUser: receivingUser,
         type: "load_messages"
@@ -85,16 +86,17 @@ export function createChat(receivingUser, previousMessages) {
     }
     console.log("PRINTING NEW CHAT")
 
-    const currentUser = localStorage.getItem("currentUser")
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"))
+
     console.log("receivingUser:", receivingUser, "\nmessage sender:", currentUser.UserID)
     const chat = document.createElement("div");
     chat.id = "chat";
     previousMessages.forEach((message) => {
         const chatLog = document.createElement("div")
         chatLog.innerHTML = `<span style='color: MediumBlue;'> ${message.UserName}</span> ` +
-        `<span style='color:rgb(192, 192, 192);'>${message.MessageDate}</span>:<br>` + message.Message;
+            `<span style='color:rgb(192, 192, 192);'>${message.MessageDate}</span>:<br>` + message.Message;
         chat.appendChild(chatLog);
-      });
+    });
 
     const textArea = document.createElement("textarea")
     textArea.id = "textBox"
@@ -104,14 +106,9 @@ export function createChat(receivingUser, previousMessages) {
         if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
 
+            console.log("Enter keypress>", currentUser.LoginName, receivingUser)
             sendMessage(textArea.value, currentUser.LoginName, receivingUser) // send message to server
-                      
-            const loadResponse = {
-                userName: currentUser.UserName,
-                receivingUser: receivingUser,
-                type: "load_messages"
-            };
-            sendEvent("load_messages", loadResponse) // refreshing messages
+
 
             return
         }
@@ -122,26 +119,38 @@ export function createChat(receivingUser, previousMessages) {
     messageBox.appendChild(chat);
 }
 
-async function sendMessage(Message, Sender, Receiver){
-    const response = {
-        Message: Message,
-        SenderName: Sender,
-        ReceiverName: Receiver,
-    }
-
+async function sendMessage(Message, Sender, Receiver) {
+    if (Sender === Receiver) return
 
     try {
         let url = `/send-message`
-        const response = await fetch(url);
 
+        const request = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                Message: Message,
+                SenderName: Sender,
+                ReceiverName: Receiver,
+            })
+        }
+
+        console.log("request>",request.body)
+
+        const response = await fetch(url, request);
 
         if (response.ok) {
-            let data = await response.json();
-            createUserList(id, data)
+            console.log(response.ok)
+            // let data = await response.json();
+            // createUserList(id, data)
+            loadMessages(Sender, Receiver)
+
         } else {
             console.log("Failed to fetch user data.");
         }
-    } catch (e){
+    } catch (e) {
         console.error(e)
     }
 }

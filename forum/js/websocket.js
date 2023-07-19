@@ -73,7 +73,7 @@ export function loadChat(data) {
     // const jsonString = JSON.stringify(data);
     console.log("messages:", data.Messages)
     if (data.Messages === null || data.Messages === undefined) return
-    createChat(data.Messages[0].ReceivingUser, data.Messages)
+    createChat(data.ReceiverName, data.Messages)
 }
 
 export function sendData(data) {

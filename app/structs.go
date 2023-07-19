@@ -87,3 +87,9 @@ type NewCommentInfo struct {
 	PostID  string `json:"hiddenPostID"`
 	Content string `json:"comment_content"`
 }
+
+type SaveMessage struct {
+	Message      string `json:"Message"`
+	SenderName   string `json:"SenderName"`
+	ReceiverName string `json:"ReceiverName"`
+}

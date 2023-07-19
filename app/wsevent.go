@@ -93,29 +93,21 @@ func LoadMessagesHandler(event Event, c *Client) error {
 		log.Printf("There was an error marshalling response %v", err)
 	}
 
-	// sending data back to the client
-	var responseEvent Event
-	responseEvent.Type = EventLoadMessages
-	responseEvent.Payload = response
-
-	c.egress <- responseEvent
-	/*
-		for client := range c.manager.clients {
-			data, err := json.Marshal(len(c.manager.clients))
-			if err != nil {
-				return fmt.Errorf("failed to marshal broadcast message: %v", err)
-			}
-
+	for client := range c.client.clients {
+		if client.userId == getUserId(loadMessage.Sender) || client.userId == getUserId(loadMessage.Receiver) {
+			// sending data back to the client
 			var responseEvent Event
-			responseEvent.Type = EventGetOnlineMembers
-			responseEvent.Payload = data
+			responseEvent.Type = EventLoadMessages
+			responseEvent.Payload = response
+
 			client.egress <- responseEvent
 		}
-	*/
+	}
+
 	return nil
 }
 
-const EventSendMessage = "send_message"
+const EventSendMessage = "send_message2"
 
 func SendMessageHandler(event Event, c *Client) error {
 	fmt.Println("EVENT:", "sending message")
@@ -129,7 +121,7 @@ func SendMessageHandler(event Event, c *Client) error {
 	}
 
 	receivingUserID := getUserId(sendMessage.ReceiverName)
-	SaveChat(c.userId, receivingUserID, "0", sendMessage.Message)
+	SaveChat(c.userId, receivingUserID, sendMessage.Message)
 
 	// updating the chatbox for each individual
 	var loadMessage loadMessages

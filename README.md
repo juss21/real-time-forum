@@ -8,6 +8,8 @@ todo järk #1: real-time chat send/receive
 todo järk #1.5: like&dislike  
 todo järk #3: postituste/commentite tegemine -> vajab kõvasti lihvimist
 
+
+        
 bugid:
 
 kui kasutajate vahelist vestlust pole viskab errori:

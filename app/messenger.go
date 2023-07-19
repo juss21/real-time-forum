@@ -40,7 +40,6 @@ type ReturnChatData struct {
 }
 
 func LoadMessages(userName string, receiverName string) ReturnChatData {
-
 	var chat ReturnChatData
 
 	chat.UserName = userName
@@ -70,7 +69,7 @@ func LoadMessages(userName string, receiverName string) ReturnChatData {
 	return chat
 }
 
-func SaveChat(userID int, receiverID int, Date string, Message string) {
+func SaveChat(userID int, receiverID int, Message string) {
 
 	DateSent := time.Now().Format("02.01.2006 15:04")
 
