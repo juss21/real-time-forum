@@ -10,40 +10,9 @@ import (
 	"strings"
 	"time"
 
+	sqlDB "01.kood.tech/git/kasepuu/real-time-forum/database"
 	"github.com/gofrs/uuid"
 )
-
-func getUserId(loginInput string) (userId int) {
-	DataBase.QueryRow("SELECT id FROM users WHERE username = ? OR email = ?", loginInput, loginInput).Scan(&userId)
-	return userId
-}
-func getUserName(userId int) (UserName string) {
-	DataBase.QueryRow("SELECT username FROM users WHERE id = ?", userId).Scan(&UserName)
-	return UserName
-}
-func getCategoryFromID(id int) (category string) {
-	DataBase.QueryRow("SELECT name FROM category WHERE id = ?", id).Scan(&category)
-	return category
-}
-
-func createCookie(w http.ResponseWriter, loginInput string) string {
-	userid := getUserId(loginInput)
-
-	session := uuid.Must(uuid.NewV4()).String()
-	http.SetCookie(w, &http.Cookie{
-		Name:   "session-" + strconv.Itoa(userid),
-		Value:  session,
-		MaxAge: int(12 * time.Hour),
-	})
-
-	DataBase.Exec("DELETE FROM session WHERE userId = ?", userid)
-	db, err := DataBase.Prepare("INSERT INTO session (key, userid) VALUES (?,?)")
-	errorHandler(err)
-
-	db.Exec(session, userid)
-
-	return session
-}
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Attempting to log in")
@@ -51,24 +20,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var loginInfo LoginInfo
 	err := json.NewDecoder(r.Body).Decode(&loginInfo)
 	errorHandler(err)
-	fmt.Println(loginInfo)
 
 	var password string
 	var userId int
-	rows := DataBase.QueryRow("SELECT password, id FROM users WHERE username = ? OR email = ?", loginInfo.Login, loginInfo.Login)
+	rows := sqlDB.DataBase.QueryRow("SELECT password, id FROM users WHERE username = ? OR email = ?", loginInfo.Login, loginInfo.Login)
 	scanErr := rows.Scan(&password, &userId)
 
 	// on bad password
 	if loginInfo.Password != password || scanErr != nil {
-		log.Println("Login was a fail!")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("sitt login!"))
+		w.Write([]byte("Please check your password and account name and try again."))
 		return
 	}
 
 	// on success
-	log.Println("Login was successful!")
-
 	response := LoginResponse{
 		LoginName: loginInfo.Login,
 		UserID:    getUserId(loginInfo.Login),
@@ -82,8 +47,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-
 }
+
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Attempting to register")
 
@@ -94,19 +59,17 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var nicknameB, emailB bool
 	var passwordB = strings.TrimSpace(registerInfo.Password) == ""
 
-	err1 := DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(username) = lower(?))", registerInfo.Username).Scan(&nicknameB)
-	err2 := DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(email) = lower(?))", registerInfo.Email).Scan(&emailB)
+	err1 := sqlDB.DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(username) = lower(?))", registerInfo.Username).Scan(&nicknameB)
+	err2 := sqlDB.DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(email) = lower(?))", registerInfo.Email).Scan(&emailB)
 
 	if err1 == nil && err2 == nil {
 		if emailB || nicknameB {
 			responseMessage := ""
-			if emailB {
-				responseMessage = "email"
-			}
 			if nicknameB {
 				responseMessage = "name"
-			}
-			if passwordB {
+			} else if emailB {
+				responseMessage = "email"
+			} else if passwordB {
 				responseMessage = "passwd"
 			}
 
@@ -114,7 +77,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(registerInfo.Username + " " + registerInfo.Email + " " + "Bad register attempt! " + responseMessage))
 			return
 		} else {
-			row, err := DataBase.Prepare("INSERT INTO users (username, password, email, age, gender, firstname, lastname) VALUES (?, ?, ?, ?, ?, ?, ?)")
+			row, err := sqlDB.DataBase.Prepare("INSERT INTO users (username, password, email, age, gender, firstname, lastname) VALUES (?, ?, ?, ?, ?, ?, ?)")
 			if err != nil {
 				log.Println(err)
 				return
@@ -147,11 +110,15 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge: -1,
 	})
 
-	_, err := DataBase.Exec("DELETE FROM session WHERE userId = ?", userId)
-	errorHandler(err)
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Logout was successful!"))
+	id, err := strconv.Atoi(userId)
+	if err == nil {
+		removeSessionById(id)
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Logout was successful!"))
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Bad attempt!"))
+	}
 
 }
 
@@ -160,7 +127,7 @@ func HasCookieHandler(w http.ResponseWriter, r *http.Request) {
 	uid := r.URL.Query().Get("UserID")
 
 	var hasCookie bool
-	err := DataBase.QueryRow("SELECT EXISTS(SELECT 1 FROM session WHERE key = ? AND userId = ?)", key, uid).Scan(&hasCookie)
+	err := sqlDB.DataBase.QueryRow("SELECT EXISTS(SELECT 1 FROM session WHERE key = ? AND userId = ?)", key, uid).Scan(&hasCookie)
 	errorHandler(err)
 
 	if hasCookie {
@@ -172,62 +139,33 @@ func HasCookieHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func SaveSession(key string, userId int) {
-	DataBase.Exec("DELETE FROM session WHERE userId = ?", userId)
+// functions
 
-	statement, _ := DataBase.Prepare("INSERT INTO session (key, userId) VALUES (?,?)")
+func createCookie(w http.ResponseWriter, loginInput string) string {
+	userid := getUserId(loginInput)
+
+	session := uuid.Must(uuid.NewV4()).String()
+	http.SetCookie(w, &http.Cookie{
+		Name:   "session-" + strconv.Itoa(userid),
+		Value:  session,
+		MaxAge: int(12 * time.Hour),
+	})
+
+	sqlDB.DataBase.Exec("DELETE FROM session WHERE userId = ?", userid)
+	db, err := sqlDB.DataBase.Prepare("INSERT INTO session (key, userid) VALUES (?,?)")
+	errorHandler(err)
+
+	db.Exec(session, userid)
+
+	return session
+}
+
+func SaveSession(key string, userId int) {
+	sqlDB.DataBase.Exec("DELETE FROM session WHERE userId = ?", userId)
+
+	statement, _ := sqlDB.DataBase.Prepare("INSERT INTO session (key, userId) VALUES (?,?)")
 	_, err := statement.Exec(key, userId)
 	if err != nil {
 		fmt.Println("one per user")
-	}
-}
-
-func getUserIdFomMessage(User string) (userID int) {
-	DataBase.QueryRow("SELECT id FROM users WHERE username = ?", User).Scan(&userID)
-	return
-}
-
-func getUserNameByID(UserID int) (UserName string) {
-	DataBase.QueryRow("SELECT username FROM users WHERE id = ?", UserID).Scan(&UserName)
-	return
-}
-
-func LoadMessages(userName string, receiverName string) returnChatData {
-
-	var chat returnChatData
-
-	chat.UserName = userName
-	chat.ReceiverName = receiverName
-
-	userID := getUserIdFomMessage(userName)
-	receiverID := getUserIdFomMessage(receiverName)
-
-	rows, err := DataBase.Query(`SELECT userid, receiverid, datesent, message FROM chat WHERE (userid = ? AND receiverid = ?) OR
-	(receiverid = ? AND userid = ?) ORDER BY datesent DESC`, userID, receiverID, userID, receiverID)
-	if err != nil {
-		log.Println(err)
-	}
-	defer rows.Close()
-	var sender, receiver int
-	for rows.Next() {
-		var messageData ReturnMessage
-
-		rows.Scan(&sender, &receiver, &messageData.MessageDate, &messageData.Message )
-		log.Println(sender, "senderISHEREEEEE")
-		messageData.UserName = getUserNameByID(sender)
-		messageData.ReceivingUser = getUserNameByID(receiver)
-		log.Println(messageData, "SIIIIIIN", sender, receiver, "PEKKIS")
-		
-		chat.Messages = append(chat.Messages, messageData)
-	}
-	return chat
-}
-
-func SaveChat(userID int, receiverID int, DateSent string, Message string) {
-
-	statement, _ := DataBase.Prepare("INSERT INTO chat (userid, receiverid, datesent, message) VALUES (?,?,?,?)")
-	_, err2 := statement.Exec(userID, receiverID, DateSent, Message)
-	if err2 != nil {
-		fmt.Println("Error saving message!!!")
 	}
 }

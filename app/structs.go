@@ -1,7 +1,5 @@
 package app
 
-import "database/sql"
-
 type UserResponse struct {
 	UserID   int
 	UserName string
@@ -16,8 +14,6 @@ type UsersOnlineResponse struct {
 	Userlist []UserStruct
 	Amount   int
 }
-
-var DataBase *sql.DB
 
 // information that will be pushed in to the site
 type CurrentUser struct {

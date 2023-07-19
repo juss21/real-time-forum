@@ -91,16 +91,15 @@ function checkIfValidAttempt(formData) {
 }
 
 async function registerResponse(response) {
+    console.log("respnse:",response)
     if (response.ok) {
         navigateTo("/login")
-        //        window.location.href = "/" 
     } else {
         let message = await response.text()
         console.log(message)
         if (message.includes("name")) document.getElementById("ErrorBox").innerHTML = "Nickname already taken!"
         if (message.includes("email")) document.getElementById("ErrorBox").innerHTML = "Email already in use!"
         if (message.includes("passwd")) document.getElementById("ErrorBox").innerHTML = "Password cannot be empty!"
-
     }
 }
 

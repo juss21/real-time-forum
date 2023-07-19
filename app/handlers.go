@@ -5,26 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	sqlDB "01.kood.tech/git/kasepuu/real-time-forum/database"
 )
 
-func getAllUsers(r *http.Request) (users []UserResponse) {
-	uid := r.URL.Query().Get("UserID")
-
-	rows, _ := DataBase.Query("SELECT id, username FROM users WHERE id != ?", uid)
-	defer rows.Close()
-	for rows.Next() {
-		var user UserResponse
-		rows.Scan(&user.UserID, &user.UserName)
-		users = append(users, user)
-	}
-	return
-}
-
-func SendUserList(w http.ResponseWriter, r *http.Request) {
+func GetUserListHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Userlist, request!")
 	userList := getAllUsers(r)
 	w.WriteHeader(http.StatusOK)
@@ -35,26 +23,7 @@ func SendUserList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAllPosts() (posts []PostResponse) {
-	rows, err := DataBase.Query("SELECT id, userId, title, content, categoryId, date FROM posts")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var post PostResponse
-		var categoryId int
-		rows.Scan(&post.PostID, &post.OriginalPosterID, &post.Title, &post.Content, &categoryId, &post.Date)
-
-		post.OriginalPoster = getUserName(post.OriginalPosterID)
-		post.Category = getCategoryFromID(categoryId)
-		posts = append(posts, post)
-	}
-	return
-}
-
-func SendPostList(w http.ResponseWriter, r *http.Request) {
+func GetPostListHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Post send, request!")
 	posts := getAllPosts()
 	w.WriteHeader(http.StatusOK)
@@ -63,36 +32,18 @@ func SendPostList(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
+
 }
 
-func getAllComments(postId int) (postData PostResponse, comments []CommentResponse) {
-	rows, err := DataBase.Query("SELECT id, userId, content, datecommented FROM comments WHERE postId = ?", postId)
+func SaveMessageHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Saving message!")
+	var newPostInfo NewPostInfo
+	err := json.NewDecoder(r.Body).Decode(&newPostInfo)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var comment CommentResponse
-		rows.Scan(&comment.CommentID, &comment.OriginalPosterID, &comment.Content, &comment.Date)
-		comment.PostID = postId
-		comment.OriginalPoster = getUserName(comment.OriginalPosterID)
-		comments = append(comments, comment)
+	} else {
 	}
-
-	row, erro := DataBase.Query("SELECT userId, title, content, categoryId, date FROM posts WHERE id = ?", postId)
-	if erro != nil {
-		fmt.Println(erro)
-		os.Exit(0)
-	}
-
-	for row.Next() {
-		row.Scan(&postData.OriginalPosterID, &postData.Title, &postData.Content, &postData.Category, &postData.Date)
-		postData.OriginalPoster = getUserName(postData.OriginalPosterID)
-	}
-
-	return postData, comments
+	w.WriteHeader(http.StatusOK)
 }
 
 func SendCommentList(w http.ResponseWriter, r *http.Request) {
@@ -137,7 +88,7 @@ func AddPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 
-		statement, _ := DataBase.Prepare("INSERT INTO posts (userId, title, content, categoryId, date) VALUES (?,?,?,?,?)")
+		statement, _ := sqlDB.DataBase.Prepare("INSERT INTO posts (userId, title, content, categoryId, date) VALUES (?,?,?,?,?)")
 
 		currentTime := time.Now().Format("02.01.2006 15:04")
 
@@ -149,8 +100,8 @@ func AddPostHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("TIPTOP!"))
 	}
-
 }
+
 func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 	var newCommentInfo NewCommentInfo
 	err := json.NewDecoder(r.Body).Decode(&newCommentInfo)
@@ -168,7 +119,7 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(newCommentInfo.Content + " " + newCommentInfo.PostID))
 		return
 	} else {
-		statement, _ := DataBase.Prepare("INSERT INTO comments (userId, postId, content, datecommented) VALUES (?,?,?,?)")
+		statement, _ := sqlDB.DataBase.Prepare("INSERT INTO comments (userId, postId, content, datecommented) VALUES (?,?,?,?)")
 
 		currentTime := time.Now().Format("02.01.2006 15:04")
 
@@ -180,5 +131,4 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("TIPTOP!"))
 	}
-
 }

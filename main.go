@@ -8,6 +8,8 @@ import (
 	"strconv"
 
 	"01.kood.tech/git/kasepuu/real-time-forum/app"
+	sqlDB "01.kood.tech/git/kasepuu/real-time-forum/database"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -23,27 +25,25 @@ func main() {
 
 	// if .db file deleted, it will create new one and populate with data
 	if errors.Is(err, os.ErrNotExist) {
-		app.DataBase, _ = sql.Open("sqlite3", "database/database.db")
-		app.InitDatabase()
-		defer app.DataBase.Close()
+		sqlDB.DataBase, _ = sql.Open("sqlite3", "database/database.db")
+		sqlDB.InitDatabase()
+		defer sqlDB.DataBase.Close()
 		fmt.Println("New database created ")
 	} else {
-		app.DataBase, _ = sql.Open("sqlite3", "database/database.db")
-		defer app.DataBase.Close()
+		sqlDB.DataBase, _ = sql.Open("sqlite3", "database/database.db")
+		defer sqlDB.DataBase.Close()
 	}
 
 	app.StartServer(port) // server
 }
 
-// function that checks string for letters
-func getPort() (port string) {
-	defaultPort := "8080"
+func getPort() string {
+	serverPort := "8080" // 8080 port by default
 	if len(os.Args) > 1 {
 		port, err := strconv.Atoi(os.Args[1])
 		if err == nil {
-			defaultPort = strconv.Itoa(port)
+			serverPort = strconv.Itoa(port)
 		}
 	}
-
-	return defaultPort
+	return serverPort
 }

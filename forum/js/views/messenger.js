@@ -76,7 +76,6 @@ const chatResponse = {
         type: "load_messages"
     };
     sendEvent("load_messages", chatResponse)
-    loadChat(chatResponse)
 }
 
 
@@ -84,7 +83,10 @@ export function createChat(receivingUser, previousMessages) {
     if (document.getElementById("chat")) {
         document.getElementById("chat").remove()
     }
+    console.log("PRINTING NEW CHAT")
 
+    const currentUser = localStorage.getItem("currentUser")
+    console.log("receivingUser:", receivingUser, "\nmessage sender:", currentUser.UserID)
     const chat = document.createElement("div");
     chat.id = "chat";
     previousMessages.forEach((message) => {
@@ -101,7 +103,16 @@ export function createChat(receivingUser, previousMessages) {
     textArea.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
-            sendMessage(receivingUser);
+
+            sendMessage(textArea.value, currentUser.LoginName, receivingUser) // send message to server
+                      
+            const loadResponse = {
+                userName: currentUser.UserName,
+                receivingUser: receivingUser,
+                type: "load_messages"
+            };
+            sendEvent("load_messages", loadResponse) // refreshing messages
+
             return
         }
     });
@@ -109,6 +120,30 @@ export function createChat(receivingUser, previousMessages) {
 
     chat.appendChild(textArea)
     messageBox.appendChild(chat);
+}
+
+async function sendMessage(Message, Sender, Receiver){
+    const response = {
+        Message: Message,
+        SenderName: Sender,
+        ReceiverName: Receiver,
+    }
+
+
+    try {
+        let url = `/send-message`
+        const response = await fetch(url);
+
+
+        if (response.ok) {
+            let data = await response.json();
+            createUserList(id, data)
+        } else {
+            console.log("Failed to fetch user data.");
+        }
+    } catch (e){
+        console.error(e)
+    }
 }
 
 function formatDate(date) {
@@ -124,7 +159,7 @@ function formatDate(date) {
     return formattedDate;
 }
 
-function sendMessage(receivingUser) {
+function sendMessage3(receivingUser) {
 
     const chatArea = document.getElementById('chat')
     const textArea = document.getElementById('textBox')

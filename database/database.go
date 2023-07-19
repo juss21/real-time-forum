@@ -1,17 +1,18 @@
-package app
+package sqlDB
 
 import (
-	"fmt"
+	"database/sql"
 	"io/ioutil"
 	"log"
 )
 
+var DataBase *sql.DB
+
 func InitDatabase() {
-	file, err := ioutil.ReadFile("db.sql")
+	file, err := ioutil.ReadFile("database.sql")
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println("ok")
 	DataBase.Exec(string(file))
 }
 

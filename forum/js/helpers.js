@@ -35,6 +35,7 @@ export async function hasCookie(cookie) {
     }
 }
 
+// not used
 export async function getOnlineUsers() {
     try {
         const url = `/get-active-users`;

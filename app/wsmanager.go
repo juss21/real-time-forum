@@ -58,8 +58,9 @@ func (m *wsManager) routeEvent(event Event, c *Client) error {
 
 func (m *wsManager) serveWs(w http.ResponseWriter, r *http.Request) {
 	userId, err := strconv.Atoi(r.URL.Query().Get("UserID"))
-	log.Println("new ws connection!", userId)
-
+	if err != nil {
+		log.Println("WebSocket: At connection, failed to fetch the UserID!")
+	}
 	// upgrade regular http connection into websocket
 	conn, err := websockerUpgrader.Upgrade(w, r, nil)
 	if err != nil {

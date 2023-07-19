@@ -19,16 +19,16 @@ type ClientList map[*Client]bool
 type Client struct {
 	//
 	connection *websocket.Conn
-	manager    *wsManager
+	client     *wsManager
 	userId     int
 	// unbuffered channel, to prevent connection getting too many connections
 	egress chan Event // avoid concurrent writes on the websocket connection
 }
 
-func NewClient(conn *websocket.Conn, manager *wsManager, userIndex int) *Client {
+func NewClient(conn *websocket.Conn, client *wsManager, userIndex int) *Client {
 	return &Client{
 		connection: conn,
-		manager:    manager,
+		client:     client,
 		userId:     userIndex,
 		egress:     make(chan Event),
 	}
@@ -37,7 +37,8 @@ func NewClient(conn *websocket.Conn, manager *wsManager, userIndex int) *Client 
 func (c *Client) readMessages() {
 	defer func() {
 		// if connection is lost, remove the client
-		c.manager.removeClient(c)
+		//removeSessionById(c.userId)
+		c.client.removeClient(c)
 	}()
 
 	// pong request
@@ -72,7 +73,7 @@ func (c *Client) readMessages() {
 		}
 
 		// at valid event, try routing
-		if err := c.manager.routeEvent(request, c); err != nil {
+		if err := c.client.routeEvent(request, c); err != nil {
 			log.Printf("Error handling the event! : %v", err)
 		}
 
@@ -83,7 +84,8 @@ func (c *Client) readMessages() {
 func (c *Client) writeMessages() {
 	defer func() {
 		// if connection is lost, remove the client
-		c.manager.removeClient(c)
+		//removeSessionById(c.userId)
+		c.client.removeClient(c)
 	}()
 
 	ticker := time.NewTicker(pingInterval)
@@ -110,7 +112,7 @@ func (c *Client) writeMessages() {
 			if err := c.connection.WriteMessage(websocket.TextMessage, data); err != nil {
 				log.Printf("WebSocket: failed to send message! %v", err)
 			}
-			log.Println("WebSocket: Message sent!", data)
+			log.Println("WebSocket: Message sent!", string(data))
 
 		case <-ticker.C:
 			//log.Println(("ping"))

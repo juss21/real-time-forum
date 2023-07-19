@@ -64,7 +64,6 @@ export async function routeEvent(event) {
     functionMap[event.type](event.payload)
 }
 
-
 export function loadOnlineMembers(data) {
     const jsonString = JSON.stringify(data);
     document.getElementById("onlineMembers").innerHTML = jsonString + "👥"
@@ -74,13 +73,14 @@ export function loadChat(data) {
     // const jsonString = JSON.stringify(data);
     console.log("messages:", data.Messages)
     if (data.Messages === null || data.Messages === undefined) return
-    createChat(data.Messages.Receiving, data.Messages )
+    createChat(data.Messages[0].ReceivingUser, data.Messages)
 }
 
 export function sendData(data) {
     const jsonString = JSON.stringify(data);
-    // console.log("Sent:", jsonString)
-
+    console.log("Sent:", jsonString)
+    //loadChat(data)
+    
 }
 
 export function waitForWSConnection(socket, cb) {

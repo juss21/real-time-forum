@@ -4,13 +4,15 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	sqlDB "01.kood.tech/git/kasepuu/real-time-forum/database"
 )
 
 func StartServer(port string) {
 
-	SessionCleanup()                                          // sessions table cleanup
+	sqlDB.SessionCleanup()                                    // sessions table cleanup
 	wsManager := NewManager()                                 // websocket manager
-	fs := noDirListing(http.FileServer(http.Dir("./forum/"))) //nodirlisting to avoid guest seeing all files stored in /web/images/
+	fs := noDirListing(http.FileServer(http.Dir("./forum/"))) // nodirlisting to avoid guest seeing all files stored in /web/images/
 
 	log.Printf("Starting server at port " + port + "\n\n")
 	log.Printf("http://localhost:" + port + "/\n")
@@ -21,21 +23,24 @@ func StartServer(port string) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./forum/index.html")
 	})
+
+	// session related
 	http.HandleFunc("/login-attempt", LoginHandler)
 	http.HandleFunc("/logout-attempt", LogoutHandler)
 	http.HandleFunc("/register-attempt", RegisterHandler)
 	http.HandleFunc("/hasCookie", HasCookieHandler)
-	http.HandleFunc("/get-posts", SendPostList)
-	http.HandleFunc("/get-users", SendUserList)
+
+	// miscellaneous
+	http.HandleFunc("/get-posts", GetPostListHandler)
 	http.HandleFunc("/get-comments", SendCommentList)
-	//http.HandleFunc("/get-active-users", SendActiveMembers)
+	http.HandleFunc("/get-users", GetUserListHandler) // -> websocketisse ümber teha!
 	http.HandleFunc("/new-post", AddPostHandler)
 	http.HandleFunc("/new-comment", AddCommentHandler)
+	http.HandleFunc("/send-message", SaveMessageHandler)
 
 	errorHandler(http.ListenAndServe(":"+port, nil))
 }
 
-// error check
 func errorHandler(err error) {
 	if err != nil {
 		log.Println(err)
