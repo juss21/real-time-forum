@@ -29,6 +29,7 @@ export function createUserList(id, userData) {
 
         userNameElement.addEventListener("click", () => {
             let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+            localStorage.setItem("CurrentChat", userName)
             createChat(currentUser.LoginName, userName)
         });
         userList.appendChild(userNameElement)
@@ -86,12 +87,18 @@ export function loadMessage(senderUser, receivingUser) {
 }
 
 
-export function displayMessages(receivingUser, previousMessages) {
+export function displayMessages(receivingUser, senderName, previousMessages) {
 
     const currentUser = JSON.parse(localStorage.getItem("currentUser"))
+    const CurrentChat = localStorage.getItem("CurrentChat")
+    console.log("CURRENTUSER:", currentUser.LoginName, "RECEIVING:", receivingUser, "CURRENTCHAT:", CurrentChat, "SENDERNAME:", senderName)
+
 
     const chat = document.getElementById('chat')
-
+    if (CurrentChat != receivingUser || !chat) {
+        //EXECUTE NOTIFICATION!
+        return
+    }
     if (previousMessages) {
         previousMessages.forEach((message) => {
             const chatLog = document.createElement("div")
@@ -110,7 +117,7 @@ export function displayMessages(receivingUser, previousMessages) {
             }
 
             chat.appendChild(chatLog);
-            if (message.UserName === currentUser.LoginName || chat.scrollTop + chat.clientHeight >= chat.scrollHeight-50) chat.scrollTo(0, chat.scrollHeight)
+            if (message.UserName === currentUser.LoginName || chat.scrollTop + chat.clientHeight >= chat.scrollHeight-100) chat.scrollTo(0, chat.scrollHeight)
         });
     }
     if (previousMessages && previousMessages.length > 1) chat.scrollTo(0, chat.scrollHeight)
