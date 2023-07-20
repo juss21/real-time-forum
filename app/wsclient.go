@@ -50,7 +50,7 @@ func (c *Client) readMessages() {
 	c.connection.SetPongHandler(c.pongHandler)
 
 	for {
-		messageType, payload, err := c.connection.ReadMessage()
+		_, payload, err := c.connection.ReadMessage()
 
 		if err != nil {
 			// if connection is closed
@@ -77,7 +77,7 @@ func (c *Client) readMessages() {
 			log.Printf("Error handling the event! : %v", err)
 		}
 
-		log.Println("Message received:", messageType, string(payload))
+		//log.Println("Message received:", messageType, string(payload))
 	}
 }
 
@@ -112,7 +112,7 @@ func (c *Client) writeMessages() {
 			if err := c.connection.WriteMessage(websocket.TextMessage, data); err != nil {
 				log.Printf("WebSocket: failed to send message! %v", err)
 			}
-			log.Println("WebSocket: Message sent!", string(data))
+			//log.Println("WebSocket: Message sent!", string(data))
 
 		case <-ticker.C:
 			//log.Println(("ping"))

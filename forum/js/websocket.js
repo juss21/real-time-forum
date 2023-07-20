@@ -1,6 +1,6 @@
 // WEBSOCKET
 import { wsIsConnected } from "./views/home_page.js"
-import { createChat } from "./views/messenger.js"
+import { displayMessages } from "./views/messenger.js"
 
 export class Event {
     constructor(type, payload) {
@@ -48,9 +48,15 @@ export function wsAddConnection() {
 
 const functionMap = { //USAGE: functionMap["send_message"]();
     "send_message": sendData,
-    "load_messages": loadChat,
+    "load_all_messages": loadChat,
+    "load_message": loadMessage,
     "get_online_members": loadOnlineMembers,
 };
+export function loadMessage(data) {
+    console.log("message:", data)
+    displayMessages(data.ReceiverName, data.Messages)
+}
+
 
 export function sendEvent(type, payload) {
     const event = new Event(type, payload)
@@ -71,9 +77,9 @@ export function loadOnlineMembers(data) {
 
 export function loadChat(data) {
     // const jsonString = JSON.stringify(data);
-    console.log("messages:", data.Messages)
-    if (data.Messages === null || data.Messages === undefined) return
-    createChat(data.ReceiverName, data.Messages)
+    console.log("messages:", data)
+    //if (data.Messages === null || data.Messages === undefined) return
+    displayMessages(data.ReceiverName, data.Messages)
 }
 
 export function sendData(data) {

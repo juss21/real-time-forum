@@ -29,7 +29,7 @@ export function createUserList(id, userData) {
 
         userNameElement.addEventListener("click", () => {
             let currentUser = JSON.parse(localStorage.getItem("currentUser"))
-            loadMessages(currentUser.LoginName, userName)
+            createChat(currentUser.LoginName, userName)
         });
         userList.appendChild(userNameElement)
     }
@@ -69,34 +69,55 @@ export async function fetchUsers(id) {
 }
 
 
-export function loadMessages(senderUser, receivingUser) {
-    console.log("dataship:>",senderUser, receivingUser)
+export function loadAllMessages(senderUser, receivingUser) {
     const chatResponse = {
         userName: senderUser,
         receivingUser: receivingUser,
-        type: "load_messages"
     };
-    sendEvent("load_messages", chatResponse)
+    sendEvent("load_all_messages", chatResponse)
+}
+
+export function loadMessage(senderUser, receivingUser) {
+    const chatResponse = {
+        userName: senderUser,
+        receivingUser: receivingUser,
+    };
+    sendEvent("load_message", chatResponse)
 }
 
 
-export function createChat(receivingUser, previousMessages) {
-    if (document.getElementById("chat")) {
-        document.getElementById("chat").remove()
-    }
-    console.log("PRINTING NEW CHAT")
+export function displayMessages(receivingUser, previousMessages) {
 
     const currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
-    console.log("receivingUser:", receivingUser, "\nmessage sender:", currentUser.UserID)
+    const chat = document.getElementById('chat')
+
+    if (previousMessages) {
+        previousMessages.forEach((message) => {
+            const chatLog = document.createElement("div")
+            if (message.UserName === currentUser.LoginName) {
+                chatLog.innerHTML = `<span style='color: PaleGreen;'> ${message.UserName}</span> ` +
+                `<span style='color:rgb(192, 192, 192);'>${message.MessageDate}</span>:<br>` + message.Message;
+            } else {
+                chatLog.innerHTML = `<span style='color: MediumBlue;'> ${message.UserName}</span> ` +
+                `<span style='color:rgb(192, 192, 192);'>${message.MessageDate}</span>:<br>` + message.Message;
+            }
+
+            chat.appendChild(chatLog);
+            if (message.UserName === currentUser.LoginName || chat.scrollTop + chat.clientHeight >= chat.scrollHeight-50) chat.scrollTo(0, chat.scrollHeight)
+        });
+    }
+    if (previousMessages && previousMessages.length > 1) chat.scrollTo(0, chat.scrollHeight)
+}
+
+export function createChat(currentUser, receivingUser) {
+
+    if (document.getElementById("chat")) {
+        document.getElementById("chat").remove()
+    }
     const chat = document.createElement("div");
     chat.id = "chat";
-    previousMessages.forEach((message) => {
-        const chatLog = document.createElement("div")
-        chatLog.innerHTML = `<span style='color: MediumBlue;'> ${message.UserName}</span> ` +
-            `<span style='color:rgb(192, 192, 192);'>${message.MessageDate}</span>:<br>` + message.Message;
-        chat.appendChild(chatLog);
-    });
+    loadAllMessages(currentUser, receivingUser)
 
     const textArea = document.createElement("textarea")
     textArea.id = "textBox"
@@ -106,22 +127,20 @@ export function createChat(receivingUser, previousMessages) {
         if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
 
-            console.log("Enter keypress>", currentUser.LoginName, receivingUser)
-            sendMessage(textArea.value, currentUser.LoginName, receivingUser) // send message to server
-
-
+            console.log("Enter keypress>", currentUser, receivingUser)
+            sendMessage(textArea.value, currentUser, receivingUser) // send message to server
+            //createChat(currentUser, receivingUser)
+            textArea.value = "";
+            
             return
         }
     });
     const messageBox = document.getElementById('messageBox');
-
     chat.appendChild(textArea)
     messageBox.appendChild(chat);
 }
 
 async function sendMessage(Message, Sender, Receiver) {
-    if (Sender === Receiver) return
-
     try {
         let url = `/send-message`
 
@@ -137,7 +156,7 @@ async function sendMessage(Message, Sender, Receiver) {
             })
         }
 
-        console.log("request>",request.body)
+        console.log("request>", request.body)
 
         const response = await fetch(url, request);
 
@@ -145,8 +164,7 @@ async function sendMessage(Message, Sender, Receiver) {
             console.log(response.ok)
             // let data = await response.json();
             // createUserList(id, data)
-            loadMessages(Sender, Receiver)
-
+            loadMessage(Sender, Receiver)
         } else {
             console.log("Failed to fetch user data.");
         }
@@ -197,3 +215,4 @@ function sendMessage3(receivingUser) {
     }
     chatArea.scrollTo(0, chatArea.scrollHeight)
 }
+            // let data = await response.json();
