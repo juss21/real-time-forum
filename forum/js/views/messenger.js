@@ -132,7 +132,6 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
         });
     }
     //if (previousMessages && previousMessages.length > 1 && !scrolling) chat.scrollTo(0, chat.scrollHeight)
-    console.log(previousMessages.length)
     if (!scrolling) {
 
         // if ((loadedMessage.UserName === currentUser.LoginName 
