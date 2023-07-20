@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 )
 
 type Event struct {
@@ -32,30 +34,41 @@ func (m *wsManager) setupEventHandlers() {
 	m.handlers[EventSendMessage] = SendMessageHandler
 	m.handlers[EventLoadMessages] = LoadMessagesHandler
 	m.handlers[EventOneMessage] = LoadOneMessageHandler
+	m.handlers[EventLoadPosts] = GetAllPosts
+	m.handlers[EventRefreshPosts] = GetAllPosts
+
 }
 
 const EventGetOnlineMembers = "get_online_members"
 
 func GetOnlineMembersHandler(event Event, c *Client) error {
-	var userId int
-	if err := json.Unmarshal(event.Payload, &userId); err != nil {
+	var payload string // stringiks teha!! praegu pushib userid ja -1 (-1 => välja logimine), sellep err
+	if err := json.Unmarshal(event.Payload, &payload); err != nil {
 		return fmt.Errorf("bad payload in request: %v", err)
 	}
+	fmt.Println("Getting online members:", payload)
 
-	fmt.Printf("EVENT: getting online members, requested by: %v\n", getUserName(userId))
+	var login = true
 
-	// sending out a update to all clients
+	if !strings.Contains(payload, "log-in") {
+		login = false
+	}
 
-	for clients := range c.client.clients {
-		fmt.Println("Currently active client, with userId:", clients.userId)
+	userId, err := strconv.Atoi(payload[7:])
+	if err != nil {
+		fmt.Println("FATAL STRCONV USERID>:", err, login)
+	}
+
+	onlineUserList := getOnlineUsers()
+	fmt.Println(onlineUserList)
+	if !login {
+		onlineUserList = removeFromSlice(onlineUserList, userId)
 	}
 
 	// sending data back to the clients
 	for client := range c.client.clients {
-
 		// TODO, ümber teha. Et messageboxis oleks võimalik eristada online/offline
-		onlineUserCount := getOnlineUsers()
-		data, err := json.Marshal(onlineUserCount)
+		data, err := json.Marshal(onlineUserList)
 		if err != nil {
 			return fmt.Errorf("failed to marshal broadcast message: %v", err)
 		}
@@ -68,6 +81,40 @@ func GetOnlineMembersHandler(event Event, c *Client) error {
 
 	return nil
 }
+
+const EventLoadPosts = "load_posts"
+const EventRefreshPosts = "refresh-posts-for-all"
+
+func GetAllPosts(event Event, c *Client) error {
+	var userId int
+	if err := json.Unmarshal(event.Payload, &userId); err != nil {
+		return fmt.Errorf("bad payload in request: %v", err)
+	}
+
+	// sending data back to the client
+	for client := range c.client.clients {
+		posts := getAllPosts()
+		data, err := json.Marshal(posts)
+		if err != nil {
+			return fmt.Errorf("failed to marshal broadcast message: %v", err)
+		}
+
+		var responseEvent Event
+		responseEvent.Type = EventLoadPosts
+		responseEvent.Payload = data
+
+		if event.Type != EventRefreshPosts && client.userId == userId {
+			client.egress <- responseEvent
+		} else {
+			client.egress <- responseEvent
+		}
+
+	}
+
+	return nil
+}
+
+/*MESSAGE HANDLERS*/
 
 const EventLoadMessages = "load_all_messages"
 

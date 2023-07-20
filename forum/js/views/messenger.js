@@ -31,7 +31,7 @@ export function createUserList(id, userData) {
         userNameElement.className = "username"
 
         userNameElement.addEventListener("click", () => {
-            let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+            let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
             localStorage.setItem("CurrentChat", userName)
             createChat(currentUser.LoginName, userName)
         });
@@ -57,7 +57,7 @@ export function createUserList(id, userData) {
 
 export async function fetchUsers(id) {
     try {
-        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+        let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
         let url = `/get-users?UserID=${currentUser.UserID}`
         const response = await fetch(url);
 
@@ -94,12 +94,15 @@ export function loadMessage(senderUser, receivingUser, limit) {
 
 export function displayMessages(receivingUser, senderName, previousMessages) {
 
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"))
+    const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
     const CurrentChat = localStorage.getItem("CurrentChat")
 
+    const chat = document.getElementById('chat')
     const chatLog = document.getElementById('chatLog')
-
-    if (chatLog) {
+    if (chatLog){
+        chatLog.className = "messages"
+    }
+    if (chatLog && scrolling) {
         chatLog.innerHTML = "";
     }
 
@@ -126,12 +129,15 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
                     `<span class="messageColor">${loadedMessage.Message}</span>`;
             }
             chatLog.appendChild(message);
-            //if ((loadedMessage.UserName === currentUser.LoginName || chat.scrollTop + chat.clientHeight >= chat.scrollHeight - 100) && !scrolling) chat.scrollTo(0, chat.scrollHeight);
         });
     }
     //if (previousMessages && previousMessages.length > 1 && !scrolling) chat.scrollTo(0, chat.scrollHeight)
 
     if (!scrolling) {
+    
+        // if ((loadedMessage.UserName === currentUser.LoginName 
+        //     || chatLog.scrollTop + chatLog.clientHeight >= chatLog.scrollHeight - 100
+        //     || previousMessages && previousMessages.length > 1) && !scrolling) chatLog.scrollTo(0, chatLog.scrollHeight);
         chatLog.scrollTop = chatLog.scrollHeight
     } else {
         chatLog.scrollTop = chatLog.scrollHeight - prevScrollHeight
@@ -151,6 +157,12 @@ export function createChat(currentUser, receivingUser) {
 
     const chat = document.createElement("div");
     chat.id = "chat";
+
+    const title = document.createElement("div")
+    title.id = "chat-title";
+    title.innerHTML = `📪${receivingUser}`
+    chat.appendChild(title)
+
     loadAllMessages(currentUser, receivingUser, limit)
 
     const chatLog = document.createElement("div")
@@ -162,11 +174,18 @@ export function createChat(currentUser, receivingUser) {
     })
     const textArea = createTextArea(currentUser, receivingUser)
 
+    const status = document.createElement("div")
+    status.id = "chat-status"
+    status.innerHTML = `📱${receivingUser} is typing...`
+
     const messageBox = document.getElementById('messageBox');
     chat.appendChild(textArea)
     chat.appendChild(chatLog)
 
+    chat.appendChild(status)
+
     messageBox.appendChild(chat);
+
 }
 
 function createTextArea(currentUser, receivingUser) {

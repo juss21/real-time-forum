@@ -113,6 +113,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(userId)
 	if err == nil {
 		removeSessionById(id)
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Logout was successful!"))
 	} else {
@@ -131,11 +132,33 @@ func HasCookieHandler(w http.ResponseWriter, r *http.Request) {
 	errorHandler(err)
 
 	if hasCookie {
+		response := map[string]string{
+			"message": "Session for user found!",
+		}
+		jsonResponse, err := json.Marshal(response)
+		if err != nil {
+			// Handle the JSON marshaling error, e.g., log the error and return an error response.
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Session for user, has been found!"))
+		w.Write(jsonResponse)
 	} else {
+		response := map[string]string{
+			"message": "Session for user not found!",
+		}
+		jsonResponse, err := json.Marshal(response)
+		if err != nil {
+			// Handle the JSON marshaling error, e.g., log the error and return an error response.
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("Session for user, NOT FOUND!"))
+		w.Write(jsonResponse)
 	}
 }
 

@@ -1,6 +1,6 @@
 import { navigateTo } from "./router.js";
-import { wsAddConnection } from "../websocket.js";
-export default function () {    
+import { clearAllCookies } from "./logout_page.js";
+export default function () {
     document.title = "Login"
 
     document.getElementById("app").innerHTML = `
@@ -26,16 +26,21 @@ export default function () {
     loginListener()
 }
 
-function loginListener(){
+function loginListener() {
     let loginForm = document.getElementById("loginForm")
     let loginData = {}
-    
-    loginForm.addEventListener("submit", async (e) =>{
+
+    loginForm.addEventListener("submit", async (e) => {
         e.preventDefault()
-        
+
+        // cleanup on login
+        localStorage.clear()
+        sessionStorage.clear()
+        clearAllCookies()
+
         var formData = new FormData(loginForm)
 
-        for (var [key, value] of formData.entries()){
+        for (var [key, value] of formData.entries()) {
             loginData[key] = value
         }
 
@@ -50,18 +55,17 @@ function loginListener(){
         try {
             let response = await fetch("/login-attempt", options)
             loginResponse(response)
-        } catch  (e){
+        } catch (e) {
             console.error(e)
         }
     })
 }
 
-async function loginResponse(response){
-    if (response.ok){
+async function loginResponse(response) {
+    if (response.ok) {
         let data = await response.json()
-        localStorage.setItem("currentUser", JSON.stringify(data))
-        navigateTo("/") 
-//        window.location.href = "/" 
+        sessionStorage.setItem("CurrentUser", JSON.stringify(data))
+        navigateTo("/")
     } else {
         let message = await response.text()
         document.getElementById("ErrorBox").innerHTML = message.replace()

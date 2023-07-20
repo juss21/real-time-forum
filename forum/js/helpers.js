@@ -1,13 +1,13 @@
 import { navigateTo } from "./views/router.js"
 
 export async function hasSession() {
-    if (localStorage.getItem("currentUser")) {
-        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+    if (sessionStorage.getItem("CurrentUser")) {
+        let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
         let sessionExists = await hasCookie(currentUser)
         if (sessionExists) {
             return true
         } else {
-            localStorage.removeItem("currentUser")
+            sessionStorage.removeItem("CurrentUser")
         }
     }
     return false

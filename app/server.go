@@ -31,7 +31,7 @@ func StartServer(port string) {
 	http.HandleFunc("/hasCookie", HasCookieHandler)
 
 	// miscellaneous
-	http.HandleFunc("/get-posts", GetPostListHandler)
+	// http.HandleFunc("/get-posts", GetPostListHandler)
 	http.HandleFunc("/get-comments", SendCommentList)
 	http.HandleFunc("/get-users", GetUserListHandler) // -> websocketisse ümber teha!
 	http.HandleFunc("/new-post", AddPostHandler)

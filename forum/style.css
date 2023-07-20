@@ -100,7 +100,7 @@ body {
   top: 45;
   margin: 0 auto;
   width: 100%;
-  height: 80%;
+  height: 100%;
   background-color: rgba(0,0,0,0.8);
   text-align: center;
 }
@@ -284,7 +284,34 @@ body {
   text-align: justify;
 }
 
+.messages{
+  margin: 20 1;
+  font-size: 20px;
+  max-height: 60%;
+}
+
+#chat-title{
+  width: 100%;
+  background-color: rgba(55,55,55,0.6);
+  height: 30px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#chat-status {
+  position: absolute;
+  bottom: 75px;
+  height: 30px;
+  width: 256px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(55, 55, 55, 0.2);
+}
+
 .messenger_currentUser{
+  margin: 10px 1px;
   text-align: left;
   color: red;
 }
@@ -302,6 +329,7 @@ body {
 }
 
 .messenger_receivingUser{
+  margin: 10px 1px;
   color: yellow;
   text-align: left;
 }
@@ -442,8 +470,7 @@ body {
 
 #chatLog {
   overflow-y: scroll;
-  font-size: 20px;
-  height: 218px;
+  overflow-x: hidden;
 }
 
 .form-popup .messageUsers {

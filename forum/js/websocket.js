@@ -1,7 +1,8 @@
 // WEBSOCKET
 import { wsIsConnected } from "./views/home_page.js"
-import { displayMessages } from "./views/messenger.js"
-
+import { createUserList, displayMessages } from "./views/messenger.js"
+import { createPostHtml } from "./views/home_data.js"
+import { navigateTo } from "./views/router.js"
 export class Event {
     constructor(type, payload) {
         this.type = type
@@ -15,7 +16,7 @@ export function wsAddConnection() {
 
         if (window.socket) window.socket.close()
 
-        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+        let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
         const ws = new WebSocket(`ws://${document.location.host}/ws?UserID=${currentUser.UserID}`)
         
 
@@ -50,13 +51,18 @@ const functionMap = { //USAGE: functionMap["send_message"]();
     "send_message": sendData,
     "load_all_messages": loadChat,
     "load_message": loadMessage,
+    "load_posts": loadPosts,
     "get_online_members": loadOnlineMembers,
+    "refresh-posts-for-all": loadPosts,
 };
 export function loadMessage(data) {
     console.log("message:", data)
     displayMessages(data.ReceiverName, data.userName, data.Messages)
 }
 
+export function loadPosts(data){
+   createPostHtml(data)
+}
 
 export function sendEvent(type, payload) {
     const event = new Event(type, payload)
@@ -71,8 +77,8 @@ export async function routeEvent(event) {
 }
 
 export function loadOnlineMembers(data) {
-    const jsonString = JSON.stringify(data);
-    document.getElementById("onlineMembers").innerHTML = jsonString + "👥"
+    document.getElementById("onlineMembers").innerHTML = data.length + "👥"
+   // createUserList(sessionStorage.getItem("CurrentUser").UserID, data) // create user list >HERE<
 }
 
 export function loadChat(data) {
@@ -89,7 +95,7 @@ export function sendData(data) {
     
 }
 
-export function waitForWSConnection(socket, cb) {
+export function waitForWSConnection(socket, cb, counter = 30) {
     setTimeout(
         function () {
             if (socket && socket.readyState === 1) {
@@ -99,7 +105,8 @@ export function waitForWSConnection(socket, cb) {
                 }
             } else {
                 console.log("Waiting for connection...")
-                waitForWSConnection(socket, cb)
+                if (counter > 0) waitForWSConnection(socket, cb, counter - 1)
+                else window.location.href = "/login"
             }
-        }, 10);
+        }, 100);
 }

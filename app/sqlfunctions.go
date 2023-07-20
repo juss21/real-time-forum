@@ -44,20 +44,24 @@ func getAllUsers(r *http.Request) (users []UserResponse) {
 	return
 }
 
-func getOnlineUsers() int {
-	onlineUsers := 0
-	rows, _ := sqlDB.DataBase.Query("SELECT COUNT(*) FROM session")
+func getOnlineUsers() (onlineUsers []int) {
+
+	rows, _ := sqlDB.DataBase.Query("SELECT userId FROM session")
+
 	defer rows.Close()
 
-	if rows.Next() {
-		rows.Scan(&onlineUsers)
+	for rows.Next() {
+
+		var id int
+		rows.Scan(&id)
+		onlineUsers = append(onlineUsers, id)
 	}
 
 	return onlineUsers
 }
 
 func getAllPosts() (posts []PostResponse) {
-	rows, err := sqlDB.DataBase.Query("SELECT id, userId, title, content, categoryId, date FROM posts")
+	rows, err := sqlDB.DataBase.Query("SELECT id, userId, title, content, categoryId, date FROM posts ORDER BY id DESC")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(0)
@@ -72,11 +76,11 @@ func getAllPosts() (posts []PostResponse) {
 		post.Category = getCategoryFromID(categoryId)
 		posts = append(posts, post)
 	}
-	return
+	return posts
 }
 
 func getAllComments(postId int) (postData PostResponse, comments []CommentResponse) {
-	rows, err := sqlDB.DataBase.Query("SELECT id, userId, content, datecommented FROM comments WHERE postId = ?", postId)
+	rows, err := sqlDB.DataBase.Query("SELECT id, userId, content, datecommented FROM comments WHERE postId = ? ORDER BY id DESC", postId)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(0)

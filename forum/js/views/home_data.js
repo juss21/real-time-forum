@@ -1,8 +1,6 @@
-export function createPostHtml(id, data) {
-    let element = document.getElementById(id)
+export function createPostHtml(data) {
+    let element = document.getElementById("posts")
     element.innerHTML = ""
-
-
 
     for (let i = 0; i < data.length; i++) {
 
@@ -63,25 +61,8 @@ function handlePostClick(event) {
     }
 }
 
-export async function fetchPosts(id) {
-    try {
-        const url = "/get-posts";
-        const response = await fetch(url);
-        if (response.ok) {
-            let data = await response.json();
-            console.log(response)
-
-            createPostHtml(id, data)
-        } else {
-            console.log("Failed to fetch user data.");
-        }
-    } catch (e) {
-        console.error(e);
-    }
-}
-
 export async function fetchComments(postId) {
-    console.log("fetching comments for: ",postId)
+    console.log("fetching comments for: ", postId)
     try {
         const url = `/get-comments?PostID=${postId}`;
         const response = await fetch(url);
@@ -103,8 +84,6 @@ function openPost(postId, data) {
     element.style.display = "inline"
     element.className = `post-${postId}`
 
-
-
     let title = document.getElementById("openedPostTitle")
     title.innerHTML = data.postData.Title
     let content = document.getElementById("openedPostContent")
@@ -118,23 +97,22 @@ function openPost(postId, data) {
 
     let likes = document.getElementById("amountOfLikes")
     likes.innerHTML = "5 👍"
-
+    likes.style.display = "none"
     let disLikes = document.getElementById("amountOfDisLikes")
     disLikes.innerHTML = "👎 5"
+    disLikes.style.display = "none"
 
     let PIDElement = document.getElementById("hiddenPostID")
     PIDElement.value = postId
 
 
-    let commentSection = document.getElementById("openedPostCommentSection")
-    commentSection.innerHTML = ""
-    for (let i = 0; i < data.comments.length; i++) {
+    if (data.comments){
+        let commentSection = document.getElementById("openedPostCommentSection")
+        commentSection.innerHTML = ""
 
-
-        createComment(data.comments[i].Content, data.comments[i].OriginalPoster, data.comments[i].Date)
-        // comment.appendChild(poster)
-        // comment.appendChild(date)
-        // element.appendChild(comment)
+        for (let i = 0; i < data.comments.length; i++) {
+            createComment(data.comments[i].Content, data.comments[i].OriginalPoster, data.comments[i].Date)
+        }
     }
 }
 

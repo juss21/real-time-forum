@@ -1,7 +1,7 @@
 import { hasSession } from "../helpers.js";
 import { navigateTo } from "./router.js";
 import { openMessenger } from "./messenger.js";
-import { fetchComments, fetchPosts } from "./home_data.js";
+import { fetchComments } from "./home_data.js";
 import { sendEvent } from "../websocket.js";
 import { wsAddConnection } from "../websocket.js";
 import { waitForWSConnection } from "../websocket.js";
@@ -92,17 +92,17 @@ export default async function () {
 
     const isAuthenticated = await hasSession()
     if (isAuthenticated) {
-        if (!wsConnectionStatus)  wsAddConnection()
+        if (!wsConnectionStatus) wsAddConnection()
 
-        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+        let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
 
         waitForWSConnection(window.socket, () => {
-            sendEvent("get_online_members", currentUser.UserID)        //getOnlineUsers()
+            sendEvent("get_online_members", `log-in-${currentUser.UserID}`) //getOnlineUsers()
+            sendEvent("load_posts", currentUser.UserID)     
         })
 
         homeHTML(currentUser)
         document.title = "Home"
-        fetchPosts("posts")
 
         const openButton = document.getElementById("openButton");
         openButton.addEventListener("click", openMessenger);
@@ -159,7 +159,7 @@ function newPostListener() {
         if (isValid()) {
             console.log("New post attempt:", "succeeded!")
             e.preventDefault()
-            let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+            let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
 
             var formData = new FormData(section)
 
@@ -178,6 +178,7 @@ function newPostListener() {
             try {
                 let response = await fetch(`/new-post?UserID=${currentUser.UserID}`, options)
                 if (response.ok) {
+                    sendEvent("refresh-posts-for-all", "new_post")
                     navigateTo("/")
                 }
             } catch (e) {
@@ -241,7 +242,7 @@ function newCommentListener() {
     section.addEventListener("submit", async (e) => {
         if (document.getElementById("CreateCommentError").innerHTML === "") {
             console.log("New comment attempt:", "succeeded!")
-            let currentUser = JSON.parse(localStorage.getItem("currentUser"))
+            let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
 
             e.preventDefault()
 
