@@ -185,16 +185,3 @@ async function sendMessage(Message, Sender, Receiver) {
         console.error(e)
     }
 }
-
-function formatDate(date) {
-    let options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        hour12: false
-    };
-    const formattedDate = date.toLocaleString('en-US', options);
-    return formattedDate;
-}
