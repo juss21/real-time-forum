@@ -76,8 +76,6 @@ func (c *Client) readMessages() {
 		if err := c.client.routeEvent(request, c); err != nil {
 			log.Printf("Error handling the event! : %v", err)
 		}
-
-		//log.Println("Message received:", messageType, string(payload))
 	}
 }
 
@@ -112,10 +110,8 @@ func (c *Client) writeMessages() {
 			if err := c.connection.WriteMessage(websocket.TextMessage, data); err != nil {
 				log.Printf("WebSocket: failed to send message! %v", err)
 			}
-			//log.Println("WebSocket: Message sent!", string(data))
 
 		case <-ticker.C:
-			//log.Println(("ping"))
 			// send a ping to the client
 			if err := c.connection.WriteMessage(websocket.PingMessage, []byte("")); err != nil {
 				log.Printf("WebSocket: was unable to ping: %v", err)
@@ -126,6 +122,5 @@ func (c *Client) writeMessages() {
 }
 
 func (c *Client) pongHandler(pongMsg string) error {
-	//log.Println("pong")
 	return c.connection.SetReadDeadline(time.Now().Add(pongWait))
 }

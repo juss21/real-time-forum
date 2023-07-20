@@ -2,6 +2,10 @@ import { routeEvent, loadChat, sendEvent } from "../websocket.js";
 import { hasSession } from "../helpers.js";
 
 let messageBox;
+let limit = 0;
+let scrolling = false;
+let scrollEnd = false;
+let prevScrollHeight;
 
 export function openMessenger() {
     fetchUsers("messageBox");
@@ -10,7 +14,6 @@ export function openMessenger() {
     openButton.style.display = "none";
     messageBox.style.display = "block";
 }
-
 
 export function createUserList(id, userData) {
 
@@ -70,18 +73,20 @@ export async function fetchUsers(id) {
 }
 
 
-export function loadAllMessages(senderUser, receivingUser) {
+export function loadAllMessages(senderUser, receivingUser, limit) {
     const chatResponse = {
         userName: senderUser,
         receivingUser: receivingUser,
+        limit: limit
     };
     sendEvent("load_all_messages", chatResponse)
 }
 
-export function loadMessage(senderUser, receivingUser) {
+export function loadMessage(senderUser, receivingUser, limit) {
     const chatResponse = {
         userName: senderUser,
         receivingUser: receivingUser,
+        limit: limit
     };
     sendEvent("load_message", chatResponse)
 }
@@ -91,47 +96,80 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
 
     const currentUser = JSON.parse(localStorage.getItem("currentUser"))
     const CurrentChat = localStorage.getItem("CurrentChat")
-    console.log("CURRENTUSER:", currentUser.LoginName, "RECEIVING:", receivingUser, "CURRENTCHAT:", CurrentChat, "SENDERNAME:", senderName)
 
+    const chatLog = document.getElementById('chatLog')
 
-    const chat = document.getElementById('chat')
+    if (chatLog) {
+        chatLog.innerHTML = "";
+    }
+
     if (CurrentChat != receivingUser || !chat) {
         //EXECUTE NOTIFICATION!
         return
     }
     if (previousMessages) {
-        previousMessages.forEach((message) => {
-            const chatLog = document.createElement("div")
-            if (message.UserName === currentUser.LoginName) {
-                chatLog.className = "messenger_currentUser"
-                chatLog.innerHTML = 
-                `<span class="dateColor">${message.MessageDate}</span> `+
-                `<span class="nameColor">${message.UserName}</span> <span class="separatorColor">:</span> ` + 
-                `<span class="messageColor">${message.Message}</span>` ;
+        previousMessages.forEach((loadedMessage) => {
+            const message = document.createElement("div");
+            message.id = "message";
+        
+            if (loadedMessage.UserName === currentUser.LoginName) {
+                message.className = "messenger_currentUser";
+                message.innerHTML =
+                    `<span class="dateColor">${loadedMessage.MessageDate}</span> ` +
+                    `<span class="nameColor">${loadedMessage.UserName}</span> <span class="separatorColor">:</span> ` +
+                    `<span class="messageColor">${loadedMessage.Message}</span>`;
             } else {
-                chatLog.className = "messenger_receivingUser"
-                chatLog.innerHTML = 
-                `<span class="dateColor">${message.MessageDate}</span> `+
-                `<span class="nameColor">${message.UserName}</span> <span class="separatorColor">:</span> ` + 
-                `<span class="messageColor">${message.Message}</span>` ;            
+                message.className = "messenger_receivingUser";
+                message.innerHTML =
+                    `<span class="dateColor">${loadedMessage.MessageDate}</span> ` +
+                    `<span class="nameColor">${loadedMessage.UserName}</span> <span class="separatorColor">:</span> ` +
+                    `<span class="messageColor">${loadedMessage.Message}</span>`;
             }
-
-            chat.appendChild(chatLog);
-            if (message.UserName === currentUser.LoginName || chat.scrollTop + chat.clientHeight >= chat.scrollHeight-100) chat.scrollTo(0, chat.scrollHeight)
+            chatLog.appendChild(message);
+            //if ((loadedMessage.UserName === currentUser.LoginName || chat.scrollTop + chat.clientHeight >= chat.scrollHeight - 100) && !scrolling) chat.scrollTo(0, chat.scrollHeight);
         });
     }
-    if (previousMessages && previousMessages.length > 1) chat.scrollTo(0, chat.scrollHeight)
+    //if (previousMessages && previousMessages.length > 1 && !scrolling) chat.scrollTo(0, chat.scrollHeight)
+
+    if (!scrolling) {
+        chatLog.scrollTop = chatLog.scrollHeight
+    } else {
+        chatLog.scrollTop = chatLog.scrollHeight - prevScrollHeight
+        if (limit > previousMessages.length) {
+            scrollEnd = true
+        }
+        scrolling = false
+    }
+
 }
 
 export function createChat(currentUser, receivingUser) {
-
     if (document.getElementById("chat")) {
         document.getElementById("chat").remove()
     }
+    limit = 10
+
     const chat = document.createElement("div");
     chat.id = "chat";
-    loadAllMessages(currentUser, receivingUser)
+    loadAllMessages(currentUser, receivingUser, limit)
 
+    const chatLog = document.createElement("div")
+    chatLog.id = "chatLog"
+    chatLog.addEventListener('scroll', (e) => {
+        //chat.innerHTML = ""
+        //chat.appendChild(createTextArea(currentUser, receivingUser))
+        throttle(loadAdditionalMessages(currentUser, receivingUser))
+    })
+    const textArea = createTextArea(currentUser, receivingUser)
+
+    const messageBox = document.getElementById('messageBox');
+    chat.appendChild(textArea)
+    chat.appendChild(chatLog)
+
+    messageBox.appendChild(chat);
+}
+
+function createTextArea(currentUser, receivingUser) {
     const textArea = document.createElement("textarea")
     textArea.id = "textBox"
     textArea.placeholder = `Send ${receivingUser} a message!`;
@@ -139,18 +177,16 @@ export function createChat(currentUser, receivingUser) {
     textArea.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
-
+            limit++
             console.log("Enter keypress>", currentUser, receivingUser)
             sendMessage(textArea.value, currentUser, receivingUser) // send message to server
             //createChat(currentUser, receivingUser)
             textArea.value = "";
-            
+
             return
         }
     });
-    const messageBox = document.getElementById('messageBox');
-    chat.appendChild(textArea)
-    messageBox.appendChild(chat);
+    return textArea
 }
 
 async function sendMessage(Message, Sender, Receiver) {
@@ -177,11 +213,32 @@ async function sendMessage(Message, Sender, Receiver) {
             console.log(response.ok)
             // let data = await response.json();
             // createUserList(id, data)
-            loadMessage(Sender, Receiver)
+            loadMessage(Sender, Receiver, 1)
         } else {
             console.log("Failed to fetch user data.");
         }
     } catch (e) {
         console.error(e)
+    }
+}
+
+
+const loadAdditionalMessages = (currentUser, receivingUser) => {
+    if (document.getElementById("chatLog").scrollTop === 0 && !scrollEnd) {
+        limit += 10
+        prevScrollHeight = document.getElementById("chatLog").scrollHeight
+        loadAllMessages(currentUser, receivingUser, limit)
+        scrolling = true
+    }
+}
+
+function throttle(func, wait) {
+    var lastEvent = 0
+    return function () {
+        var currentTime = new Date()
+        if (currentTime - lastEvent > wait) {
+            func.apply(this, arguments)
+            lastEvent = currentTime
+        }
     }
 }

@@ -75,6 +75,7 @@ type loadMessages struct {
 	Sender   string `json:"userName"`
 	Receiver string `json:"receivingUser"`
 	Method   string `json:"type"`
+	Limit    int    `json:"limit"`
 }
 
 func LoadMessagesHandler(event Event, c *Client) error {
@@ -83,7 +84,7 @@ func LoadMessagesHandler(event Event, c *Client) error {
 	var loadMessage loadMessages
 
 	sql := `SELECT userid, receiverid, datesent, message FROM chat WHERE (userid = ? AND receiverid = ?) OR
-	(receiverid = ? AND userid = ?) ORDER BY messageid`
+	(receiverid = ? AND userid = ?) ORDER BY messageid DESC LIMIT ?`
 
 	if err := json.Unmarshal(event.Payload, &loadMessage); err != nil {
 		return fmt.Errorf("bad payload in request: %v", err)
@@ -91,7 +92,7 @@ func LoadMessagesHandler(event Event, c *Client) error {
 	for client := range c.client.clients {
 		if client.userId == getUserId(loadMessage.Sender) {
 
-			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Receiver)
+			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Receiver, loadMessage.Limit)
 			response, err := json.Marshal(responseData)
 			if err != nil {
 				log.Printf("There was an error marshalling response %v", err)
@@ -133,7 +134,7 @@ func LoadOneMessageHandler(event Event, c *Client) error {
 	var loadMessage loadMessages
 
 	sql := `SELECT userid, receiverid, datesent, message FROM chat WHERE (userid = ? AND receiverid = ?) OR
-	(receiverid = ? AND userid = ?) ORDER BY messageid DESC LIMIT 1`
+	(receiverid = ? AND userid = ?) ORDER BY messageid DESC LIMIT ?`
 
 	if err := json.Unmarshal(event.Payload, &loadMessage); err != nil {
 		return fmt.Errorf("bad payload in request: %v", err)
@@ -141,7 +142,7 @@ func LoadOneMessageHandler(event Event, c *Client) error {
 	for client := range c.client.clients {
 		if client.userId == getUserId(loadMessage.Sender) {
 
-			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Receiver)
+			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Receiver, loadMessage.Limit)
 			response, err := json.Marshal(responseData)
 			if err != nil {
 				log.Printf("There was an error marshalling response %v", err)
@@ -156,7 +157,7 @@ func LoadOneMessageHandler(event Event, c *Client) error {
 
 		} else if client.userId == getUserId(loadMessage.Receiver) { //SEE OSA TEKITAB ERRORI KUI TEISEL KASUTAJAL POLE CHAT LAHTI VÕI SIIS LAEB KIRJA VALESSE CHATI
 
-			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Sender)
+			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Sender, loadMessage.Limit)
 
 			response, err := json.Marshal(responseData)
 			if err != nil {

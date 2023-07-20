@@ -39,7 +39,7 @@ type ReturnChatData struct {
 	Messages     []ReturnMessage
 }
 
-func LoadMessages(sqlSentence string, userName string, receiverName string) ReturnChatData {
+func LoadMessages(sqlSentence string, userName string, receiverName string, limit int) ReturnChatData {
 	var chat ReturnChatData
 
 	chat.UserName = userName
@@ -48,7 +48,7 @@ func LoadMessages(sqlSentence string, userName string, receiverName string) Retu
 	userID := getUserIdFomMessage(userName)
 	receiverID := getUserIdFomMessage(receiverName)
 
-	rows, err := sqlDB.DataBase.Query(sqlSentence, userID, receiverID, userID, receiverID)
+	rows, err := sqlDB.DataBase.Query(sqlSentence, userID, receiverID, userID, receiverID, limit)
 	if err != nil {
 		log.Println(err)
 	}
@@ -65,10 +65,19 @@ func LoadMessages(sqlSentence string, userName string, receiverName string) Retu
 
 		messageData.UserName = getUserNameByID(sender)
 		messageData.ReceivingUser = getUserNameByID(receiver)
-		log.Println(messageData)
 		chat.Messages = append(chat.Messages, messageData)
 	}
+	chat.Messages = reverse(chat.Messages)
 	return chat
+}
+
+func reverse(s []ReturnMessage) []ReturnMessage {
+
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+        s[i], s[j] = s[j], s[i]
+    }
+
+	return s
 }
 
 func SaveChat(userID int, receiverID int, Message string) {
