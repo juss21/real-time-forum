@@ -99,7 +99,7 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
 
     const chat = document.getElementById('chat')
     const chatLog = document.getElementById('chatLog')
-    if (chatLog){
+    if (chatLog) {
         chatLog.className = "messages"
     }
     if (chatLog && scrolling) {
@@ -114,7 +114,7 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
         previousMessages.forEach((loadedMessage) => {
             const message = document.createElement("div");
             message.id = "message";
-        
+
             if (loadedMessage.UserName === currentUser.LoginName) {
                 message.className = "messenger_currentUser";
                 message.innerHTML =
@@ -132,9 +132,9 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
         });
     }
     //if (previousMessages && previousMessages.length > 1 && !scrolling) chat.scrollTo(0, chat.scrollHeight)
-
+    console.log(previousMessages.length)
     if (!scrolling) {
-    
+
         // if ((loadedMessage.UserName === currentUser.LoginName 
         //     || chatLog.scrollTop + chatLog.clientHeight >= chatLog.scrollHeight - 100
         //     || previousMessages && previousMessages.length > 1) && !scrolling) chatLog.scrollTo(0, chatLog.scrollHeight);
@@ -152,6 +152,9 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
 export function createChat(currentUser, receivingUser) {
     if (document.getElementById("chat")) {
         document.getElementById("chat").remove()
+        scrolling = false;
+        scrollEnd = false;
+        prevScrollHeight = 0
     }
     limit = 10
 
