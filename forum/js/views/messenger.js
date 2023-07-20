@@ -96,11 +96,17 @@ export function displayMessages(receivingUser, previousMessages) {
         previousMessages.forEach((message) => {
             const chatLog = document.createElement("div")
             if (message.UserName === currentUser.LoginName) {
-                chatLog.innerHTML = `<span style='color: PaleGreen;'> ${message.UserName}</span> ` +
-                `<span style='color:rgb(192, 192, 192);'>${message.MessageDate}</span>:<br>` + message.Message;
+                chatLog.className = "messenger_currentUser"
+                chatLog.innerHTML = 
+                `<span class="dateColor">${message.MessageDate}</span> `+
+                `<span class="nameColor">${message.UserName}</span> <span class="separatorColor">:</span> ` + 
+                `<span class="messageColor">${message.Message}</span>` ;
             } else {
-                chatLog.innerHTML = `<span style='color: MediumBlue;'> ${message.UserName}</span> ` +
-                `<span style='color:rgb(192, 192, 192);'>${message.MessageDate}</span>:<br>` + message.Message;
+                chatLog.className = "messenger_receivingUser"
+                chatLog.innerHTML = 
+                `<span class="dateColor">${message.MessageDate}</span> `+
+                `<span class="nameColor">${message.UserName}</span> <span class="separatorColor">:</span> ` + 
+                `<span class="messageColor">${message.Message}</span>` ;            
             }
 
             chat.appendChild(chatLog);
@@ -185,34 +191,3 @@ function formatDate(date) {
     const formattedDate = date.toLocaleString('en-US', options);
     return formattedDate;
 }
-
-function sendMessage3(receivingUser) {
-
-    const chatArea = document.getElementById('chat')
-    const textArea = document.getElementById('textBox')
-    const message = textArea.value.trimEnd().replace(/\n/g, "<br>")
-    if (message != "") {
-        const chatLog = document.createElement("div")
-        let currentDate = formatDate(new Date())
-        let currentUser = JSON.parse(localStorage.getItem("currentUser"))
-        let messageDate = formatDate(currentDate)
-        chatLog.innerHTML = `<span style='color: MediumBlue;'> ${currentUser.LoginName}</span> ` +
-            `<span style='color:rgb(192, 192, 192);'>${messageDate}</span>:<br>` + message;
-
-        const chatMessage = {
-            userName: currentUser.LoginName,
-            receivingUser: receivingUser,
-            messageDate: messageDate,
-            message: message,
-            type: "send_message"
-        };
-        routeEvent(chatMessage)
-
-        chatArea.appendChild(chatLog)
-
-        textArea.value = "";
-        textArea.placeholder = `Send ${receivingUser} a message!`
-    }
-    chatArea.scrollTo(0, chatArea.scrollHeight)
-}
-            // let data = await response.json();

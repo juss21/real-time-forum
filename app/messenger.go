@@ -58,6 +58,11 @@ func LoadMessages(sqlSentence string, userName string, receiverName string) Retu
 		var messageData ReturnMessage
 
 		rows.Scan(&sender, &receiver, &messageData.MessageDate, &messageData.Message)
+		messageDateTime, err := time.Parse(time.RFC3339Nano, messageData.MessageDate)
+		if err == nil {
+			messageData.MessageDate = messageDateTime.Format("15:04:05")
+		}
+
 		messageData.UserName = getUserNameByID(sender)
 		messageData.ReceivingUser = getUserNameByID(receiver)
 		log.Println(messageData)
@@ -68,7 +73,7 @@ func LoadMessages(sqlSentence string, userName string, receiverName string) Retu
 
 func SaveChat(userID int, receiverID int, Message string) {
 
-	DateSent := time.Now().Format("02.01.2006 15:04")
+	DateSent := time.Now().Format(time.RFC3339Nano)
 
 	statement, _ := sqlDB.DataBase.Prepare("INSERT INTO chat (userid, receiverid, datesent, message) VALUES (?,?,?,?)")
 	_, err2 := statement.Exec(userID, receiverID, DateSent, Message)

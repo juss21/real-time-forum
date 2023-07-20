@@ -14,7 +14,6 @@ export async function hasSession() {
 }
 
 export async function hasCookie(cookie) {
-
     try {
         const url = `/hasCookie?CookieKey=${cookie.CookieKey}&UserID=${cookie.UserID}`
 

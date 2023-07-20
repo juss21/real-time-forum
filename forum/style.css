@@ -284,6 +284,40 @@ body {
   text-align: justify;
 }
 
+.messenger_currentUser{
+  text-align: left;
+  color: red;
+}
+.messenger_currentUser .nameColor{
+  color: wheat;
+}
+.messenger_currentUser .dateColor{
+  color:rgb(192, 192, 192);
+}
+.messenger_currentUser .separatorColor{
+  color: black;
+}
+.messenger_currentUser .messageColor{
+  color: whitesmoke;
+}
+
+.messenger_receivingUser{
+  color: yellow;
+  text-align: left;
+}
+.messenger_receivingUser .nameColor{
+  color: aqua;
+}
+.messenger_receivingUser .dateColor{
+  color: rgb(192, 192, 192);
+}
+.messenger_receivingUser .separatorColor{
+  color: black;
+}
+.messenger_receivingUser .messageColor{
+  color: white;
+}
+
 #openedPostOriginalPoster {
   position: absolute;
   top: 100;
