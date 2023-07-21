@@ -2,8 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"errors"
-	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -14,26 +13,34 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("sqlite3", "database/database.db")
-	if err != nil {
-		fmt.Println("Error opening the database:", err)
-		return
-	}
-	defer db.Close()
+	dbFilePath := "database/database.db"
+	if _, err := os.Stat(dbFilePath); os.IsNotExist(err) {
+		// File does not exist, create a new database and populate it with data
+		db, err := sql.Open("sqlite3", dbFilePath)
+		if err != nil {
+			log.Println("[SERVER] Error opening the database:", err)
+			return
+		}
+		defer db.Close()
 
-	port := getPort()
-
-	// if .db file deleted, it will create new one and populate with data
-	if errors.Is(err, os.ErrNotExist) {
-		sqlDB.DataBase, _ = sql.Open("sqlite3", "database/database.db")
+		sqlDB.DataBase = db
 		sqlDB.InitDatabase()
-		defer sqlDB.DataBase.Close()
-		fmt.Println("New database created ")
+		log.Println("[SERVER] New database created.")
 	} else {
-		sqlDB.DataBase, _ = sql.Open("sqlite3", "database/database.db")
-		defer sqlDB.DataBase.Close()
+		// File exists, open the existing database
+		db, err := sql.Open("sqlite3", dbFilePath)
+		if err != nil {
+			log.Println("[SERVER] Error opening the database:", err)
+			return
+		}
+		defer db.Close()
+
+		sqlDB.DataBase = db
+		log.Println("[SERVER] Database found!")
 	}
 
+	// Proceed with starting the server
+	port := getPort()
 	app.StartServer(port) // server
 }
 

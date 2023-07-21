@@ -37,7 +37,6 @@ func NewClient(conn *websocket.Conn, client *wsManager, userIndex int) *Client {
 func (c *Client) readMessages() {
 	defer func() {
 		// if connection is lost, remove the client
-		//removeSessionById(c.userId)
 		c.client.removeClient(c)
 	}()
 
@@ -46,6 +45,7 @@ func (c *Client) readMessages() {
 		log.Printf("pong request failed %v", err)
 		return
 	}
+
 	c.connection.SetReadLimit(512) // setting maximum limit, to avoid malicious activities
 	c.connection.SetPongHandler(c.pongHandler)
 
@@ -59,11 +59,6 @@ func (c *Client) readMessages() {
 			}
 			break
 		}
-
-		// temporarily send message to all clients!
-		// for wsclient := range c.manager.clients {
-		// 	wsclient.egress <- payload
-		// }
 
 		var request Event
 
@@ -82,7 +77,6 @@ func (c *Client) readMessages() {
 func (c *Client) writeMessages() {
 	defer func() {
 		// if connection is lost, remove the client
-		//removeSessionById(c.userId)
 		c.client.removeClient(c)
 	}()
 

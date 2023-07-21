@@ -39,8 +39,8 @@ export function createUserList(userData, element) {
         userNameElement.id = userName
         userNameElement.className = "username"
 
-        if (userData[i].Status) userNameElement.style.color = "yellow"
-        else userNameElement.style.color = "green"
+        if (userData[i].Status) userNameElement.className = userNameElement.className + " " + "online" 
+        else userNameElement.className = userNameElement.className + " " + "offline" 
 
         if (localStorage.getItem("CurrentChat")) createChat(currentUser.LoginName, localStorage.getItem("CurrentChat"))
 
@@ -138,7 +138,7 @@ function notificationHTML(message, sender) {
 
     // Set a timeout to remove the notification after 10 seconds
     setTimeout(function () {
-        notification.remove();
+        notificationDIV.remove();
     }, 7000); // 10000 milliseconds = 10 seconds
 }
 
@@ -148,10 +148,10 @@ export function displayIsWriting(sender, receiver) {
     const chatStatus = document.getElementById("chat-status")
 
     const chat = document.getElementById('chat')
-    console.log("writing?")
+    
     if (!chatStatus) return
-    if (receiver === currentUser.LoginName) { console.log("receiver on prg kasutaja", receiver, currentUser.LoginName); return }
-    if (CurrentChat !== receiver || !chat) { console.log("currentchat on vale!", CurrentChat, sender); return }
+    if (receiver === currentUser.LoginName) { return }
+    if (CurrentChat !== receiver || !chat) { return }
 
     clearTimeout(timeOut)
 
@@ -162,8 +162,6 @@ export function displayIsWriting(sender, receiver) {
     timeOut = setTimeout(function () {
         chatStatus.innerHTML = ""
     }, 1000);
-    console.log("sending to:", sender)
-    console.log("receiver:", receiver)
 }
 
 export function displayMessages(receivingUser, senderName, previousMessages, loadall = false) {
@@ -273,7 +271,6 @@ function createTextArea(currentUser, receivingUser) {
     })
 
     textArea.addEventListener('keydown', (e) => {
-
         if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
             limit++
@@ -300,9 +297,9 @@ async function sendMessage(Message, Sender, Receiver) {
 
 const loadAdditionalMessages = (currentUser, receivingUser) => {
     if (document.getElementById("chatLog").scrollTop === 0 && !scrollEnd) {
-        limit += 10
-        prevScrollHeight = document.getElementById("chatLog").scrollHeight
-        loadAllMessages(currentUser, receivingUser, limit)
+        limit += 10 // increasing the message limit
+        prevScrollHeight = document.getElementById("chatLog").scrollHeight // previous scroll height
+        loadAllMessages(currentUser, receivingUser, limit) // fetch more messags
         scrolling = true
     }
 }
@@ -311,8 +308,9 @@ export function throttle(func, wait) {
     var lastEvent = 0
     return function () {
         var currentTime = new Date()
+        // check if time elapsed is greater than wait
         if (currentTime - lastEvent > wait) {
-            func.apply(this, arguments)
+            func.apply(this, arguments) // refactoring the original function
             lastEvent = currentTime
         }
     }

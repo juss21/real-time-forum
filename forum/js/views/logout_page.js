@@ -1,7 +1,6 @@
 import { hasSession } from "../helpers.js"
 import { sendEvent } from "../websocket.js"
 import { navigateTo } from "./router.js"
-import { wsIsDisConnected } from "./home_page.js"
 
 export default async function () {
     if (hasSession()) {
@@ -27,19 +26,14 @@ async function logoutAttempt(currentUser) {
 
 function logoutResponse(response) {
     if (response.ok) {
-        console.log("[Response] Logout succeeded!")
-
-        sessionStorage.removeItem("CurrentUser")
-
         // cleanup on logout
         localStorage.clear()
         sessionStorage.clear()
         clearAllCookies()
 
         navigateTo("/login")
-        wsIsDloadChatisConnected()
     } else {
-        console.log("logout failed!")
+        console.log("logout failed! (????)")
     }
 }
 

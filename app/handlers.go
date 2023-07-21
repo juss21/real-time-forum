@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,9 +11,7 @@ import (
 	sqlDB "01.kood.tech/git/kasepuu/real-time-forum/database"
 )
 
-
 func GetPostListHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Post send, request!")
 	posts := getAllPosts()
 	w.WriteHeader(http.StatusOK)
 	err := json.NewEncoder(w).Encode(posts)
@@ -22,11 +19,9 @@ func GetPostListHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-
 }
 
 func SendCommentList(w http.ResponseWriter, r *http.Request) {
-	log.Println("Comment send, request!")
 	postId, err := strconv.Atoi(r.URL.Query().Get("PostID"))
 	if err == nil {
 		postData, comments := getAllComments(postId)
@@ -53,8 +48,6 @@ func AddPostHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&newPostInfo)
 	errorHandler(err)
 
-	fmt.Println(newPostInfo)
-
 	userId := r.URL.Query().Get("UserID")
 
 	var emptyTitle = strings.TrimSpace(newPostInfo.Title) == ""
@@ -73,7 +66,7 @@ func AddPostHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, erro := statement.Exec(userId, newPostInfo.Title, newPostInfo.Content, 2, currentTime)
 		if erro != nil {
-			fmt.Println("one per user")
+			log.Println("SQL [ERROR]: one per user")
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -85,8 +78,6 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 	var newCommentInfo NewCommentInfo
 	err := json.NewDecoder(r.Body).Decode(&newCommentInfo)
 	errorHandler(err)
-
-	fmt.Println(newCommentInfo)
 
 	userId := r.URL.Query().Get("UserID")
 
@@ -104,7 +95,7 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, erro := statement.Exec(userId, newCommentInfo.PostID, newCommentInfo.Content, currentTime)
 		if erro != nil {
-			fmt.Println("one per user")
+			log.Println("SQL [ERROR]: one per user")
 		}
 
 		w.WriteHeader(http.StatusOK)

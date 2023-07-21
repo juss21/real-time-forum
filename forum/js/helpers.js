@@ -1,4 +1,4 @@
-import { navigateTo } from "./views/router.js"
+import { clearAllCookies } from "./views/logout_page.js"
 
 export async function hasSession() {
     if (sessionStorage.getItem("CurrentUser")) {
@@ -7,17 +7,18 @@ export async function hasSession() {
         if (sessionExists) {
             return true
         } else {
-            sessionStorage.removeItem("CurrentUser")
+            localStorage.clear()
+            sessionStorage.clear()
+            clearAllCookies()
         }
     }
     return false
 }
 
 export async function hasCookie(cookie) {
+    // do this in websocket later?
     try {
         const url = `/hasCookie?CookieKey=${cookie.CookieKey}&UserID=${cookie.UserID}`
-
-        //await new Promise(resolve => setTimeout(resolve, 50));
 
         const response = await fetch(url)
 
@@ -34,7 +35,7 @@ export async function hasCookie(cookie) {
     }
 }
 
-// not used
+// not used, just saved as an reminder on how polling works
 export async function getOnlineUsers() {
     try {
         const url = `/get-active-users`;

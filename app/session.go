@@ -15,8 +15,6 @@ import (
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Attempting to log in")
-
 	var loginInfo LoginInfo
 	err := json.NewDecoder(r.Body).Decode(&loginInfo)
 	errorHandler(err)
@@ -50,8 +48,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Attempting to register")
-
 	var registerInfo RegisterInfo
 	err := json.NewDecoder(r.Body).Decode(&registerInfo)
 	errorHandler(err)
@@ -100,7 +96,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Attempting to log out")
 	userId := r.URL.Query().Get("UserID")
 	currentSession := "session-" + userId
 	fmt.Println(userId, currentSession)
@@ -189,6 +184,6 @@ func SaveSession(key string, userId int) {
 	statement, _ := sqlDB.DataBase.Prepare("INSERT INTO session (key, userId) VALUES (?,?)")
 	_, err := statement.Exec(key, userId)
 	if err != nil {
-		fmt.Println("one per user")
+		log.Println("SQL [ERROR]: one per user")
 	}
 }

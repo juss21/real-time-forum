@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -74,8 +73,8 @@ func LoadMessages(sqlSentence string, userName string, receiverName string, limi
 func reverse(s []ReturnMessage) []ReturnMessage {
 
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-        s[i], s[j] = s[j], s[i]
-    }
+		s[i], s[j] = s[j], s[i]
+	}
 
 	return s
 }
@@ -87,6 +86,6 @@ func SaveChat(userID int, receiverID int, Message string) {
 	statement, _ := sqlDB.DataBase.Prepare("INSERT INTO chat (userid, receiverid, datesent, message) VALUES (?,?,?,?)")
 	_, err2 := statement.Exec(userID, receiverID, DateSent, Message)
 	if err2 != nil {
-		fmt.Println("Error saving message!!!")
+		log.Println("SQL [ERROR]: unable to save message")
 	}
 }

@@ -1,13 +1,12 @@
 import { hasSession } from "../helpers.js";
 import { navigateTo } from "./router.js";
 import { openMessenger } from "./messenger.js";
-import { fetchComments } from "./home_data.js";
+import { fetchComments } from "./postComment.js";
 import { sendEvent } from "../websocket.js";
 import { wsAddConnection } from "../websocket.js";
 import { waitForWSConnection } from "../websocket.js";
 function homeHTML(currentUser){
     document.getElementById("app").innerHTML = `
-
         <nav class="nav">
         <a class="nav__link" id="onlineMembers"></a>
         <a class="nav__link">Welcome, ${currentUser.LoginName}!</a>
@@ -78,25 +77,17 @@ function homeHTML(currentUser){
         `
 }
 
-let wsConnectionStatus = false
-
-export function wsIsConnected(){
-    wsConnectionStatus = true
-}
-export function wsIsDisConnected(){
-    wsConnectionStatus = false
-}
 
 export default async function () {
-
     const isAuthenticated = await hasSession()
     if (isAuthenticated) {
-        if (!wsConnectionStatus) wsAddConnection()
+        wsAddConnection()
 
         let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
 
+        // websocket events that will be sent on connection
         waitForWSConnection(window.socket, () => {
-            sendEvent("get_online_members", `log-in-${currentUser.UserID}`) //getOnlineUsers()
+            sendEvent("get_online_members", `log-in-${currentUser.UserID}`) //getOnlineUsers() <- previously
             sendEvent("load_posts", currentUser.UserID)         
             sendEvent("update_users", "other Login")
         })
@@ -134,9 +125,8 @@ export default async function () {
         addEventListener("keyup", (e) => {
             if (e.key === "Escape" && document.getElementById("openedPost").style.display !== "none" && document.getElementById("newCommentSection").style.display === "none") {
                 document.getElementById("openedPost").style.display = "none";
-            }
-        })
-        addEventListener("keyup", (e) => {
+            } 
+            
             if (e.key === "Escape" && document.getElementById("newCommentSection").style.display !== "none" && document.getElementById("openedPost").style.display !== "none") {
                 document.getElementById("newCommentSection").style.display = "none";
             }
@@ -178,7 +168,7 @@ function newPostListener() {
             try {
                 let response = await fetch(`/new-post?UserID=${currentUser.UserID}`, options)
                 if (response.ok) {
-                    sendEvent("refresh-posts-for-all", "new_post")
+                    sendEvent("load_posts", "new_post")
                     navigateTo("/")
                 }
             } catch (e) {

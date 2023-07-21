@@ -156,3 +156,14 @@ func removeSessionById(id int) {
 	_, err := sqlDB.DataBase.Exec("DELETE FROM session WHERE userId = ?", id)
 	errorHandler(err)
 }
+
+/*non-sql (o.o)*/
+func removeFromSlice(slice []int, element int) []int {
+	var result []int
+	for _, item := range slice {
+		if item != element {
+			result = append(result, item)
+		}
+	}
+	return result
+}

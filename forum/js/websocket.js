@@ -1,8 +1,6 @@
 // WEBSOCKET
-import { wsIsConnected } from "./views/home_page.js"
 import { createUserList, displayMessages, displayIsWriting } from "./views/messenger.js"
-import { createPostHtml } from "./views/home_data.js"
-import { navigateTo } from "./views/router.js"
+import { createPostHtml } from "./views/postComment.js"
 export class Event {
     constructor(type, payload) {
         this.type = type
@@ -12,15 +10,12 @@ export class Event {
 
 export function wsAddConnection() {
     if (window["WebSocket"]) {
-        wsIsConnected()
 
         if (window.socket) window.socket.close()
 
         let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
         const ws = new WebSocket(`ws://${document.location.host}/ws?UserID=${currentUser.UserID}`)
         
-
-
         ws.onopen = () => {
             console.log("WebSocket Connection established!")
         }
@@ -47,14 +42,14 @@ export function wsAddConnection() {
     }
 }
 
-const functionMap = { //USAGE: functionMap["send_message"]();
+const functionMap = { 
+    //USAGE: functionMap["send_message"]();
     "send_message": sendData,
     "load_all_messages": loadChat,
     "load_message": loadMessage,
     "load_posts": loadPosts,
     "update_users": updateUserList,
     "get_online_members": loadOnlineMembers,
-    "refresh-posts-for-all": loadPosts,
     "is_typing": updateIsTyping,
 };
 

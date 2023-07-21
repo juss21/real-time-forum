@@ -52,7 +52,7 @@ function handlePostClick(event) {
     // Check if the clicked element has the "post" id
     const target = event.target
     if (target.id.includes("post-")) {
-        event.preventDefault() // Prevent the default link behavior
+        event.preventDefault() // Prevent the default event behavior
 
         const postId = event.target.id.replace("post-", "")
         // saving current postId at localstorage
@@ -62,7 +62,7 @@ function handlePostClick(event) {
 }
 
 export async function fetchComments(postId) {
-    console.log("fetching comments for: ", postId)
+    // console.log("fetching comments for: ", postId)
     try {
         const url = `/get-comments?PostID=${postId}`;
         const response = await fetch(url);
@@ -77,7 +77,6 @@ export async function fetchComments(postId) {
         console.error(e);
     }
 }
-
 
 function openPost(postId, data) {
     let element = document.getElementById("openedPost")
@@ -95,6 +94,7 @@ function openPost(postId, data) {
     let date = document.getElementById("openedPostDate")
     date.innerHTML = data.postData.Date
 
+    // likes are disabled for now..
     let likes = document.getElementById("amountOfLikes")
     likes.innerHTML = "5 👍"
     likes.style.display = "none"
@@ -122,7 +122,6 @@ function createComment(commentContent, commentOP, commentDate) {
     let commentBody = document.createElement("div")
     commentBody.id = "openedPostComment"
 
-    // left side (avatar/user/date)
     let commentAvatarBody = document.createElement("div")
     commentAvatarBody.id = "openedPostCommentAvatar"
 
@@ -154,36 +153,4 @@ function createComment(commentContent, commentOP, commentDate) {
 
     commentSection.appendChild(commentBody)
 
-    /*
-               
-            </div>
-            <div id="openedPostCommentContent"><div>Content goes here</div></div>
-            </div>
-    
-     */
-
 }
-
-/* 
-  <div id="openedPost" style="display:none"><button class="closePostBTN">X</button>
-        <div id="openedPostSection">
-        <div id="openedPostTitle">Pealkiri</div>
-        <div id="openedPostContent">siin on mingi sisue</div>
-        <div id="openedPostOriginalPoster">Madis</div>
-        <div id="openedPostDate">23 feb</div>
-        <div id="openedPostAvatar"><img id="profilepic" src="/forum/images/avatarTemplate.png"></div>
-        </div>
-        
-        <div id="openedPostCommentSection">
-            <div id="openedPostComment">
-            <div id="openedPostCommentAvatar">
-            <img id="profilepic" src="/forum/images/avatarTemplate.png">
-            <div>
-                <div id="openedPostCommentOP">Taat</div>
-                <div id="openedPostCommentDate">24 Feb</div>
-            </div>
-        </div>
-        <div id="openedPostCommentContent"><div>Content goes here</div></div>
-        </div>
-
- */

@@ -7,7 +7,7 @@ import logout_page from "./logout_page.js"
 
 export function navigateTo(url) {
     history.pushState(null, null, url)
-    router()   //https://www.youtube.com/watch?v=6BozpmSjk-Y&ab_channel=dcode @21:15
+    router() 
 }
 
 export async function router() {
@@ -42,7 +42,7 @@ export async function router() {
 
     let matchFound = potentialMatches.find(potentialMatches => potentialMatches.isMatch)
     if (matchFound) {
-        matchFound.route.view()// <- changing scenery with this
+        matchFound.route.view() // <- scenery change
     } else {
         error_page();
     }

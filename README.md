@@ -1,49 +1,47 @@
-#### REAL-TIME-FORUM    
-    
-README in progress...   
-    
-todo:   
-
-todo järk #1: real-time chat send/receive        
-todo järk #1.5: like&dislike  
-todo järk #3: postituste/commentite tegemine -> vajab kõvasti lihvimist
-
-
-        
-bugid:
-
-kui kasutajate vahelist vestlust pole viskab errori:
+# REAL-TIME-FORUM    📚📚📚
 ```
-{"UserName":"uus","ReceiverName":"joel","Messages":null}
-Uncaught (in promise) TypeError: Cannot read properties of null (reading 'forEach')
-    at createChat (messenger.js:89:22)
-    at routeEvent (websocket.js:38:13)
-    at socket.onmessage (websocket.js:15:13)
-```    
-kui sõnumit saata    
-```
-{"UserName":"123","ReceiverName":"eqwr","Messages":[{"UserName":"123","ReceivingUser":"eqwr","MessageDate":"July 12, 2023 at 17:51","Message":"tere"}]}
-websocket.js:14 {"userName":"123","receivingUser":"eqwr","messageDate":"July 15, 2023 at 02:22","message":"aed","type":"send_message"}
-Uncaught (in promise) SyntaxError: "[object Object]" is not valid JSON
-    at JSON.parse (<anonymous>)
-    at routeEvent (websocket.js:37:36)
-    at sendMessage (messenger.js:146:9)
-    at HTMLTextAreaElement.<anonymous> (messenger.js:103:13)
-messenger.js:89 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'forEach')
-    at createChat (messenger.js:89:22)
-    at routeEvent (websocket.js:38:13)
-    at socket.onmessage (websocket.js:15:13)
+TODO
+real-time communication laeb chatboxi kõik sõnumid ära <-ws->
+loadAllMessages <-> loadMessage
+database.sql -> database creation CREATE IF ...
+onlineusers -> colorid korda teha
 ```
 
+##ABOUT
+* ####This is real-time-forum project, that must have:
+* a working real-time chat
+* ability to post, comment
 
-later: css      
-    
+##USAGE
+```
+ go run . <port> // port is optional, this will be 8080 by default
+```
 
-üle vaadata:
-done* registeri tühjad inputid kontrolli alla saada     
+###EXISTING USERS
+```
+if you are too lazy, you can try out the forum using these premade accounts:
+>user	|	 password
+>123			  123
+>123aae		123
+```
 
-hiljem, kui aega ja igav on: 
-fix: f5 refresh?    
+###GOOD-TO-KNOW
+```
+    CHAT indicators:
+     🟢online
+     ⚪offline
+```
+
+#####MAIN-REQUIREMENTS
+```
+sqlite3, golang support
+```
 
 
+
+######Recommended videos:
+```
+Routing > https://www.youtube.com/watch?v=6BozpmSjk-Y&ab_channel=dcode
+WebSocket > https://www.youtube.com/watch?v=pKpKv9MKN-E&ab_channel=ProgrammingPercy
+```
 ### Authors [juss](https://01.kood.tech/git/juss) & [kasepuu](https://01.kood.tech/git/kasepuu) 
