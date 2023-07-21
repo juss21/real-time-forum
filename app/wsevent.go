@@ -116,8 +116,6 @@ func GetAllPosts(event Event, c *Client) error {
 
 /*MESSAGE HANDLERS*/
 
-
-
 type loadMessages struct {
 	Sender   string `json:"userName"`
 	Receiver string `json:"receivingUser"`
@@ -133,7 +131,7 @@ func SortUserList(event Event, c *Client) error {
 	if err := json.Unmarshal(event.Payload, &loadMessage); err != nil {
 		return fmt.Errorf("bad payload in request: %v", err)
 	}
-	
+
 	for client := range c.client.clients {
 		if client.userId == getUserId(loadMessage.Sender) || client.userId == getUserId(loadMessage.Receiver) {
 
@@ -220,21 +218,28 @@ func LoadOneMessageHandler(event Event, c *Client) error {
 	}
 	for client := range c.client.clients {
 		if client.userId == getUserId(loadMessage.Sender) || client.userId == getUserId(loadMessage.Receiver) {
+			
+			receiverName := ""
+			if client.userId == getUserId(loadMessage.Sender) {
+				receiverName = loadMessage.Receiver
+			} else {
+				receiverName = loadMessage.Sender
+			}
 
-			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Receiver, loadMessage.Limit)
+			responseData := LoadMessages(sql, getUserName(client.userId), receiverName, loadMessage.Limit)
 			response, err := json.Marshal(responseData)
 			if err != nil {
 				log.Printf("There was an error marshalling response %v", err)
 			}
-
+			log.Println("SÕNUM SIIN:", responseData)
 			// sending data back to the client
 			var responseEvent Event
-			responseEvent.Type = EventOneMessage
+			responseEvent.Type = EventLoadMessages
 			responseEvent.Payload = response
 
 			client.egress <- responseEvent
 
-		} 
+		}
 	}
 
 	return nil
