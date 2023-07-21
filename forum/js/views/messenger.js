@@ -8,20 +8,27 @@ let scrollEnd = false;
 let prevScrollHeight;
 
 export function openMessenger() {
-    fetchUsers("messageBox");
     messageBox = document.getElementById("messageBox")
+    createMessageBox(messageBox)
+    updateUserList(JSON.parse(sessionStorage.getItem("CurrentUser")).LoginName)
     let openButton = document.getElementById("openButton")
     openButton.style.display = "none";
     messageBox.style.display = "block";
 }
 
-export function createUserList(id, userData) {
-
-    const element = document.getElementById(id);
+export function createMessageBox(element) {
     element.innerHTML = "";
+    createCloseButton(element)
+}
 
+export function createUserList(userData, element) {
+    if (document.getElementById("userList")) {
+        document.getElementById("userList").remove() 
+    }
     const userList = document.createElement('div');
     userList.className = "messageUsers";
+    userList.id = "userList"
+    let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
 
     for (let i = 0; i < userData.length; i++) {
         const userName = userData[i].UserName;
@@ -31,15 +38,15 @@ export function createUserList(id, userData) {
         userNameElement.className = "username"
 
         userNameElement.addEventListener("click", () => {
-            let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
             localStorage.setItem("CurrentChat", userName)
             createChat(currentUser.LoginName, userName)
         });
         userList.appendChild(userNameElement)
     }
-
     element.appendChild(userList)
+}
 
+function createCloseButton(element) {
     const closeButton = document.createElement("button");
     closeButton.textContent = "Close";
     closeButton.type = "button";
@@ -51,27 +58,8 @@ export function createUserList(id, userData) {
         element.style.display = "none";
         openButton.style.display = "block";
     });
-
     element.appendChild(closeButton);
 }
-
-export async function fetchUsers(id) {
-    try {
-        let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
-        let url = `/get-users?UserID=${currentUser.UserID}`
-        const response = await fetch(url);
-
-        if (response.ok) {
-            let data = await response.json();
-            createUserList(id, data)
-        } else {
-            console.log("Failed to fetch user data.");
-        }
-    } catch (e) {
-        console.error(e);
-    }
-}
-
 
 export function loadAllMessages(senderUser, receivingUser, limit) {
     const chatResponse = {
@@ -89,6 +77,15 @@ export function loadMessage(senderUser, receivingUser, limit) {
         limit: limit
     };
     sendEvent("load_message", chatResponse)
+}
+
+export function updateUserList(senderUser, receivingUser = "") {
+    const chatResponse = {
+        userName: senderUser,
+        receivingUser: receivingUser,
+        limit: 1
+    };
+    sendEvent("update_users", chatResponse)
 }
 
 
@@ -131,12 +128,7 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
             chatLog.appendChild(message);
         });
     }
-    //if (previousMessages && previousMessages.length > 1 && !scrolling) chat.scrollTo(0, chat.scrollHeight)
     if (!scrolling) {
-
-        // if ((loadedMessage.UserName === currentUser.LoginName 
-        //     || chatLog.scrollTop + chatLog.clientHeight >= chatLog.scrollHeight - 100
-        //     || previousMessages && previousMessages.length > 1) && !scrolling) chatLog.scrollTo(0, chatLog.scrollHeight);
         chatLog.scrollTop = chatLog.scrollHeight
     } else {
         chatLog.scrollTop = chatLog.scrollHeight - prevScrollHeight
@@ -145,7 +137,6 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
         }
         scrolling = false
     }
-
 }
 
 export function createChat(currentUser, receivingUser) {
@@ -170,8 +161,6 @@ export function createChat(currentUser, receivingUser) {
     const chatLog = document.createElement("div")
     chatLog.id = "chatLog"
     chatLog.addEventListener('scroll', (e) => {
-        //chat.innerHTML = ""
-        //chat.appendChild(createTextArea(currentUser, receivingUser))
         throttle(loadAdditionalMessages(currentUser, receivingUser))
     })
     const textArea = createTextArea(currentUser, receivingUser)
@@ -232,9 +221,8 @@ async function sendMessage(Message, Sender, Receiver) {
 
         if (response.ok) {
             console.log(response.ok)
-            // let data = await response.json();
-            // createUserList(id, data)
             loadMessage(Sender, Receiver, 1)
+            updateUserList(Sender, Receiver)
         } else {
             console.log("Failed to fetch user data.");
         }

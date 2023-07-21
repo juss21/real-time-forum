@@ -52,6 +52,7 @@ const functionMap = { //USAGE: functionMap["send_message"]();
     "load_all_messages": loadChat,
     "load_message": loadMessage,
     "load_posts": loadPosts,
+    "update_users": updateUserList,
     "get_online_members": loadOnlineMembers,
     "refresh-posts-for-all": loadPosts,
 };
@@ -79,6 +80,9 @@ export async function routeEvent(event) {
 export function loadOnlineMembers(data) {
     document.getElementById("onlineMembers").innerHTML = data.length + "👥"
    // createUserList(sessionStorage.getItem("CurrentUser").UserID, data) // create user list >HERE<
+}
+export function updateUserList(data) {
+    if (document.getElementById("messageBox").innerHTML != "") createUserList(data, document.getElementById("messageBox"))
 }
 
 export function loadChat(data) {

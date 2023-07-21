@@ -2,9 +2,8 @@ package app
 
 import (
 	"fmt"
-	"net/http"
 	"os"
-
+	"sort"
 	sqlDB "01.kood.tech/git/kasepuu/real-time-forum/database"
 )
 
@@ -31,9 +30,7 @@ func getUserNameByID(UserID int) (UserName string) {
 	return
 }
 
-func getAllUsers(r *http.Request) (users []UserResponse) {
-	uid := r.URL.Query().Get("UserID")
-
+func getAllUsers(uid int) (users []UserResponse) {
 	rows, _ := sqlDB.DataBase.Query("SELECT id, username FROM users WHERE id != ?", uid)
 	defer rows.Close()
 	for rows.Next() {
@@ -41,6 +38,39 @@ func getAllUsers(r *http.Request) (users []UserResponse) {
 		rows.Scan(&user.UserID, &user.UserName)
 		users = append(users, user)
 	}
+	users = sortByLastMessage(users, uid)
+	return
+}
+
+func sortByLastMessage(users []UserResponse, uid int) (sortedUsers []UserResponse) {
+
+	sql := `SELECT messageid FROM chat WHERE (userid = ? AND receiverid = ?) OR
+	(receiverid = ? AND userid = ?) ORDER BY messageid DESC LIMIT 1`
+
+	for i := 0; i < len(users); i++ {
+		rows, err := sqlDB.DataBase.Query(sql, uid, users[i].UserID, uid, users[i].UserID)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer rows.Close()
+		
+
+		if rows.Next() {
+			var user UserResponse
+
+			user.UserID = users[i].UserID
+			user.UserName = users[i].UserName
+			rows.Scan(&user.LastMessageID)
+
+			sortedUsers = append(sortedUsers, user)
+		} else {
+			 sortedUsers = append(sortedUsers, users[i])
+		}
+	}
+	sort.Slice(sortedUsers, func(i, j int) bool {
+		return sortedUsers[i].LastMessageID > sortedUsers[j].LastMessageID
+	})
+
 	return
 }
 

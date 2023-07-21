@@ -12,16 +12,6 @@ import (
 	sqlDB "01.kood.tech/git/kasepuu/real-time-forum/database"
 )
 
-func GetUserListHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Userlist, request!")
-	userList := getAllUsers(r)
-	w.WriteHeader(http.StatusOK)
-	err := json.NewEncoder(w).Encode(userList)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-}
 
 func GetPostListHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Post send, request!")

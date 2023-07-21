@@ -1,8 +1,9 @@
 package app
 
 type UserResponse struct {
-	UserID   int
-	UserName string
+	UserID        int
+	UserName      string
+	LastMessageID int
 }
 
 type UserStruct struct {

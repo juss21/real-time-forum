@@ -36,7 +36,7 @@ func (m *wsManager) setupEventHandlers() {
 	m.handlers[EventOneMessage] = LoadOneMessageHandler
 	m.handlers[EventLoadPosts] = GetAllPosts
 	m.handlers[EventRefreshPosts] = GetAllPosts
-
+	m.handlers[EventSortUsers] = SortUserList
 }
 
 const EventGetOnlineMembers = "get_online_members"
@@ -116,7 +116,7 @@ func GetAllPosts(event Event, c *Client) error {
 
 /*MESSAGE HANDLERS*/
 
-const EventLoadMessages = "load_all_messages"
+
 
 type loadMessages struct {
 	Sender   string `json:"userName"`
@@ -124,6 +124,38 @@ type loadMessages struct {
 	Method   string `json:"type"`
 	Limit    int    `json:"limit"`
 }
+
+const EventSortUsers = "update_users"
+
+func SortUserList(event Event, c *Client) error {
+	var loadMessage loadMessages
+
+	if err := json.Unmarshal(event.Payload, &loadMessage); err != nil {
+		return fmt.Errorf("bad payload in request: %v", err)
+	}
+	
+	for client := range c.client.clients {
+		if client.userId == getUserId(loadMessage.Sender) || client.userId == getUserId(loadMessage.Receiver) {
+
+			responseData := getAllUsers(client.userId)
+			response, err := json.Marshal(responseData)
+			if err != nil {
+				log.Printf("There was an error marshalling response %v", err)
+			}
+
+			// sending data back to the client
+			var responseEvent Event
+			responseEvent.Type = EventSortUsers
+			responseEvent.Payload = response
+
+			client.egress <- responseEvent
+		}
+	}
+
+	return nil
+}
+
+const EventLoadMessages = "load_all_messages"
 
 func LoadMessagesHandler(event Event, c *Client) error {
 	fmt.Println("EVENT:", "loading messages", c.userId)
@@ -187,7 +219,7 @@ func LoadOneMessageHandler(event Event, c *Client) error {
 		return fmt.Errorf("bad payload in request: %v", err)
 	}
 	for client := range c.client.clients {
-		if client.userId == getUserId(loadMessage.Sender) {
+		if client.userId == getUserId(loadMessage.Sender) || client.userId == getUserId(loadMessage.Receiver) {
 
 			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Receiver, loadMessage.Limit)
 			response, err := json.Marshal(responseData)
@@ -197,27 +229,12 @@ func LoadOneMessageHandler(event Event, c *Client) error {
 
 			// sending data back to the client
 			var responseEvent Event
-			responseEvent.Type = EventLoadMessages
+			responseEvent.Type = EventOneMessage
 			responseEvent.Payload = response
 
 			client.egress <- responseEvent
 
-		} else if client.userId == getUserId(loadMessage.Receiver) { //SEE OSA TEKITAB ERRORI KUI TEISEL KASUTAJAL POLE CHAT LAHTI VÕI SIIS LAEB KIRJA VALESSE CHATI
-
-			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Sender, loadMessage.Limit)
-
-			response, err := json.Marshal(responseData)
-			if err != nil {
-				log.Printf("There was an error marshalling response %v", err)
-			}
-
-			// sending data back to the client
-			var responseEvent Event
-			responseEvent.Type = EventLoadMessages
-			responseEvent.Payload = response
-
-			client.egress <- responseEvent
-		}
+		} 
 	}
 
 	return nil
