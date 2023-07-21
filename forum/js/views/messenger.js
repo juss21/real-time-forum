@@ -41,6 +41,8 @@ export function createUserList(userData, element) {
         if (userData[i].Status) userNameElement.style.color = "yellow"
         else userNameElement.style.color = "green"
 
+        if (localStorage.getItem("CurrentChat")) createChat(currentUser.LoginName, localStorage.getItem("CurrentChat"))
+
         userNameElement.addEventListener("click", () => {
             localStorage.setItem("CurrentChat", userName)
             createChat(currentUser.LoginName, userName)
@@ -100,31 +102,66 @@ export function displayNotification(sender, receiver) {
 }
 
 function notificationHTML(message, sender) {
-    const notification = document.createElement("div")
-    notification.className = "notificationBar"
+    const notificationDIV = document.createElement("div")
+    notificationDIV.className = "notificationBar"
+
+    const notificationMessage = document.createElement("div")
+    notificationMessage.className = "notificationMessage"
+    notificationDIV.appendChild(notificationMessage)
+
+    const closeNotification = document.createElement("button")
+    closeNotification.id = "notificationBNT"
+    closeNotification.innerHTML = "X"
+    notificationDIV.appendChild(closeNotification)
 
     const textMessage = document.createElement("h1")
     textMessage.innerHTML = message
+    notificationMessage.appendChild(textMessage)
 
-    notification.addEventListener("click", ()=>{
+
+    closeNotification.addEventListener("click", () => {
+        notificationDIV.remove()
+    })
+
+    notificationMessage.addEventListener("click", () => {
         console.log("kliklik")
         if (!localStorage.getItem("CurrentChat")) localStorage.setItem("CurrentChat", sender)
         else localStorage.setItem("CurrentChat", sender)
-
         openMessenger()
-        const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
-        createChat(currentUser.LoginName, sender)
-    }) 
+        notificationDIV.remove();
+    })
 
-    notification.appendChild(textMessage)
 
-    document.getElementById("app").appendChild(notification)
+    document.getElementById("app").appendChild(notificationDIV)
 
 
     // Set a timeout to remove the notification after 10 seconds
     setTimeout(function () {
         notification.remove();
-    }, 10000); // 10000 milliseconds = 10 seconds
+    }, 7000); // 10000 milliseconds = 10 seconds
+}
+
+export function displayIsWriting(sender, receiver) {
+    const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
+    const CurrentChat = localStorage.getItem("CurrentChat")
+    const chatStatus = document.getElementById("chat-status")
+
+    const chat = document.getElementById('chat')
+    console.log("writing?")
+    if (!chatStatus) return
+    if (receiver === currentUser.LoginName) { console.log("receiver on prg kasutaja", receiver, currentUser.LoginName); chatStatus.innerHTML = ""; return }
+    if (CurrentChat !== receiver || !chat) { console.log("currentchat on vale!", CurrentChat, sender); chatStatus.innerHTML = ""; return }
+
+    let messageformat = `📱${receiver} is typing...`
+
+    chatStatus.innerHTML = messageformat
+
+     // Set a timeout to remove the notification after 10 seconds
+     setTimeout(function () {
+        chatStatus.innerHTML = ""
+    }, 2000); // 10000 milliseconds = 10 seconds
+    console.log("sending to:", sender)
+    console.log("receiver:", receiver)
 }
 
 export function displayMessages(receivingUser, senderName, previousMessages, loadall = false) {
@@ -142,7 +179,7 @@ export function displayMessages(receivingUser, senderName, previousMessages, loa
     }
 
     if ((CurrentChat != receivingUser || !chat) && !loadall) {
-        //displayNotification(receivingUser, currentUser.LoginName)
+        displayNotification(receivingUser, currentUser.LoginName)
         return
     }
     if (!chat) return
@@ -207,7 +244,7 @@ export function createChat(currentUser, receivingUser) {
 
     const status = document.createElement("div")
     status.id = "chat-status"
-    status.innerHTML = `📱${receivingUser} is typing...`
+    status.innerHTML = ""
 
     const messageBox = document.getElementById('messageBox');
     chat.appendChild(textArea)
@@ -224,7 +261,17 @@ function createTextArea(currentUser, receivingUser) {
     textArea.id = "textBox"
     textArea.placeholder = `Send ${receivingUser} a message!`;
     textArea.maxLength = "10000"
+
+    textArea.addEventListener('input', (e) => {
+        const response = {
+            currentUser: currentUser,
+            receivingUser: receivingUser,
+        }
+        sendEvent("is_typing", response)
+    })
+
     textArea.addEventListener('keydown', (e) => {
+
         if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
             limit++

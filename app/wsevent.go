@@ -37,6 +37,37 @@ func (m *wsManager) setupEventHandlers() {
 	m.handlers[EventLoadPosts] = GetAllPosts
 	m.handlers[EventRefreshPosts] = GetAllPosts
 	m.handlers[EventSortUsers] = SortUserList
+	m.handlers[EventIsTyping] = IsTypingHandler
+}
+
+const EventIsTyping = "is_typing"
+
+type isTypingFormat struct {
+	CurrentUser   string `json:"currentUser"`
+	ReceivingUser string `json:"receivingUser"`
+}
+
+func IsTypingHandler(event Event, c *Client) error {
+	var payload isTypingFormat
+	if err := json.Unmarshal(event.Payload, &payload); err != nil {
+		return fmt.Errorf("bad payload in request: %v", err)
+	}
+
+	for client := range c.client.clients {
+		if client.userId == getUserId(payload.ReceivingUser) {
+			data, err := json.Marshal(payload)
+			if err != nil {
+				return fmt.Errorf("failed to marshal broadcast message: %v", err)
+			}
+
+			var responseEvent Event
+			responseEvent.Type = EventIsTyping
+			responseEvent.Payload = data
+			client.egress <- responseEvent
+		}
+	}
+
+	return nil
 }
 
 const EventGetOnlineMembers = "get_online_members"
@@ -44,7 +75,7 @@ const EventGetOnlineMembers = "get_online_members"
 var onlineUsersArray []int
 
 func GetOnlineMembersHandler(event Event, c *Client) error {
-	var payload string // stringiks teha!! praegu pushib userid ja -1 (-1 => välja logimine), sellep err
+	var payload string
 	if err := json.Unmarshal(event.Payload, &payload); err != nil {
 		return fmt.Errorf("bad payload in request: %v", err)
 	}

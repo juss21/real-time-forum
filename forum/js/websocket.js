@@ -1,6 +1,6 @@
 // WEBSOCKET
 import { wsIsConnected } from "./views/home_page.js"
-import { createUserList, displayMessages } from "./views/messenger.js"
+import { createUserList, displayMessages, displayIsWriting } from "./views/messenger.js"
 import { createPostHtml } from "./views/home_data.js"
 import { navigateTo } from "./views/router.js"
 export class Event {
@@ -55,9 +55,14 @@ const functionMap = { //USAGE: functionMap["send_message"]();
     "update_users": updateUserList,
     "get_online_members": loadOnlineMembers,
     "refresh-posts-for-all": loadPosts,
+    "is_typing": updateIsTyping,
 };
+
+function updateIsTyping(data){
+    displayIsWriting(data.receivingUser, data.currentUser)
+}
+
 export function loadMessage(data) {
-    console.log("message:", data)
     displayMessages(data.ReceiverName, data.userName, data.Messages)
     //displayNotification(data.ReceiverName, data.userName)
 }
