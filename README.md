@@ -27,9 +27,9 @@ if you are too lazy, you can try out the forum using these premade accounts:
 
 ###GOOD-TO-KNOW
 ```
-    CHAT indicators:
-     🟢online
-     ⚪offline
+CHAT indicators:
+ 🟢online
+ ⚪offline
 ```
 
 #####MAIN-REQUIREMENTS
