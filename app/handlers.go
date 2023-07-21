@@ -25,24 +25,6 @@ func GetPostListHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func SaveMessageHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Saving message!")
-	var newMessageInfo SaveMessage
-
-	err := json.NewDecoder(r.Body).Decode(&newMessageInfo)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("There was an issue Decoding your message!"))
-		return
-	} else {
-		fmt.Println("MESSAGE:>", newMessageInfo)
-
-		SaveChat(getUserId(newMessageInfo.SenderName), getUserId(newMessageInfo.ReceiverName), newMessageInfo.Message)
-
-		w.WriteHeader(http.StatusOK)
-	}
-}
-
 func SendCommentList(w http.ResponseWriter, r *http.Request) {
 	log.Println("Comment send, request!")
 	postId, err := strconv.Atoi(r.URL.Query().Get("PostID"))

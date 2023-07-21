@@ -159,7 +159,6 @@ export function displayIsWriting(sender, receiver) {
 
     chatStatus.innerHTML = messageformat
 
-     // Set a timeout to remove the notification after 10 seconds
     timeOut = setTimeout(function () {
         chatStatus.innerHTML = ""
     }, 1000);
@@ -280,9 +279,7 @@ function createTextArea(currentUser, receivingUser) {
             limit++
             console.log("Enter keypress>", currentUser, receivingUser)
             sendMessage(textArea.value, currentUser, receivingUser) // send message to server
-            //createChat(currentUser, receivingUser)
             textArea.value = "";
-
             return
         }
     });
@@ -290,37 +287,16 @@ function createTextArea(currentUser, receivingUser) {
 }
 
 async function sendMessage(Message, Sender, Receiver) {
-    try {
-        let url = `/send-message`
-
-        const request = {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                Message: Message,
-                SenderName: Sender,
-                ReceiverName: Receiver,
-            })
-        }
-
-        console.log("request>", request.body)
-
-        const response = await fetch(url, request);
-
-        if (response.ok) {
-            console.log(response.ok)
-            loadMessage(Sender, Receiver, 1)
-            updateUserList(Sender, Receiver)
-        } else {
-            console.log("Failed to fetch user data.");
-        }
-    } catch (e) {
-        console.error(e)
+    const request = {
+        Message: Message,
+        SenderName: Sender,
+        ReceiverName: Receiver,
     }
-}
+    sendEvent("send_message", request)
 
+    loadMessage(Sender, Receiver, 1)
+    updateUserList(Sender, Receiver)
+}
 
 const loadAdditionalMessages = (currentUser, receivingUser) => {
     if (document.getElementById("chatLog").scrollTop === 0 && !scrollEnd) {

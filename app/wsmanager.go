@@ -35,13 +35,6 @@ func NewManager() *wsManager {
 	return manager
 }
 
-func broadcastUpdate(c *Client) error {
-	// for client := range c.manager.clients {
-	// 	data, err := json.Marshal()
-	// }
-	return nil
-}
-
 func (m *wsManager) routeEvent(event Event, c *Client) error {
 	// if event type is part of handlers, return nil
 	if handler, ok := m.handlers[event.Type]; ok {
