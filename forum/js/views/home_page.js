@@ -5,7 +5,6 @@ import { fetchComments } from "./home_data.js";
 import { sendEvent } from "../websocket.js";
 import { wsAddConnection } from "../websocket.js";
 import { waitForWSConnection } from "../websocket.js";
-
 function homeHTML(currentUser){
     document.getElementById("app").innerHTML = `
 
@@ -98,7 +97,8 @@ export default async function () {
 
         waitForWSConnection(window.socket, () => {
             sendEvent("get_online_members", `log-in-${currentUser.UserID}`) //getOnlineUsers()
-            sendEvent("load_posts", currentUser.UserID)     
+            sendEvent("load_posts", currentUser.UserID)         
+            sendEvent("update_users", "other Login")
         })
 
         homeHTML(currentUser)

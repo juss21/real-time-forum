@@ -41,6 +41,8 @@ func (m *wsManager) setupEventHandlers() {
 
 const EventGetOnlineMembers = "get_online_members"
 
+var onlineUsersArray []int
+
 func GetOnlineMembersHandler(event Event, c *Client) error {
 	var payload string // stringiks teha!! praegu pushib userid ja -1 (-1 => välja logimine), sellep err
 	if err := json.Unmarshal(event.Payload, &payload); err != nil {
@@ -64,6 +66,7 @@ func GetOnlineMembersHandler(event Event, c *Client) error {
 	if !login {
 		onlineUserList = removeFromSlice(onlineUserList, userId)
 	}
+	onlineUsersArray = onlineUserList
 
 	// sending data back to the clients
 	for client := range c.client.clients {
@@ -127,27 +130,34 @@ const EventSortUsers = "update_users"
 
 func SortUserList(event Event, c *Client) error {
 	var loadMessage loadMessages
+	forOthers := strings.Contains(string(event.Payload), "other")
+	fmt.Println(string(event.Payload), forOthers)
 
 	if err := json.Unmarshal(event.Payload, &loadMessage); err != nil {
-		return fmt.Errorf("bad payload in request: %v", err)
+		if !forOthers {
+			return fmt.Errorf("bad payload in request: %v", err)
+		}
 	}
 
 	for client := range c.client.clients {
-		if client.userId == getUserId(loadMessage.Sender) || client.userId == getUserId(loadMessage.Receiver) {
-
-			responseData := getAllUsers(client.userId)
-			response, err := json.Marshal(responseData)
-			if err != nil {
-				log.Printf("There was an error marshalling response %v", err)
-			}
-
-			// sending data back to the client
-			var responseEvent Event
-			responseEvent.Type = EventSortUsers
-			responseEvent.Payload = response
-
-			client.egress <- responseEvent
+		if forOthers && client.userId == c.userId {
+			continue
 		}
+		//if client.userId == getUserId(loadMessage.Sender) || client.userId == getUserId(loadMessage.Receiver) || string(event.Payload) == "newRegister" {
+
+		responseData := getAllUsers(client.userId)
+		response, err := json.Marshal(responseData)
+		if err != nil {
+			log.Printf("There was an error marshalling response %v", err)
+		}
+
+		// sending data back to the client
+		var responseEvent Event
+		responseEvent.Type = EventSortUsers
+		responseEvent.Payload = response
+
+		client.egress <- responseEvent
+		//	}
 	}
 
 	return nil
@@ -218,7 +228,7 @@ func LoadOneMessageHandler(event Event, c *Client) error {
 	}
 	for client := range c.client.clients {
 		if client.userId == getUserId(loadMessage.Sender) || client.userId == getUserId(loadMessage.Receiver) {
-			
+
 			receiverName := ""
 			if client.userId == getUserId(loadMessage.Sender) {
 				receiverName = loadMessage.Receiver

@@ -7,6 +7,7 @@ export default async function () {
     if (hasSession()) {
         let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
         sendEvent("get_online_members", `logout-${currentUser.UserID}`)
+        sendEvent("update_users", "other Logout")
         logoutAttempt(currentUser)
     } else {
         navigateTo("/")

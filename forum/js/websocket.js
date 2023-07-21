@@ -59,6 +59,7 @@ const functionMap = { //USAGE: functionMap["send_message"]();
 export function loadMessage(data) {
     console.log("message:", data)
     displayMessages(data.ReceiverName, data.userName, data.Messages)
+    displayNotification(data.ReceiverName, data.userName)
 }
 
 export function loadPosts(data){

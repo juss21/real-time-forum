@@ -25,6 +25,7 @@ export function createUserList(userData, element) {
     if (document.getElementById("userList")) {
         document.getElementById("userList").remove() 
     }
+
     const userList = document.createElement('div');
     userList.className = "messageUsers";
     userList.id = "userList"
@@ -34,8 +35,11 @@ export function createUserList(userData, element) {
         const userName = userData[i].UserName;
         const userNameElement = document.createElement("div");
         userNameElement.textContent = userName;
-        userNameElement.id = userName
+        userNameElement.id = userName 
         userNameElement.className = "username"
+
+        if (userData[i].Status) userNameElement.style.color = "yellow"
+        else userNameElement.style.color = "green" 
 
         userNameElement.addEventListener("click", () => {
             localStorage.setItem("CurrentChat", userName)
@@ -88,6 +92,29 @@ export function updateUserList(senderUser, receivingUser = "") {
     sendEvent("update_users", chatResponse)
 }
 
+export function displayNotification(sender, receiver){
+    let message = `${receiver}, you have received a message from ${sender}! pleace check`
+
+}
+
+function notificationHTML(){
+
+
+    const notification = document.createElement("div")
+    notification.className = "notificationBar"
+
+    const textMessage = document.createElement("h1")
+    textMessage.innerHTML = message
+
+    notification.appendChild(textMessage)
+
+    document.getElementById("app").appendChild(notification)
+
+ // Set a timeout to remove the notification after 10 seconds
+ setTimeout(function() {
+    notification.remove();
+}, 100000000); // 10000 milliseconds = 10 seconds
+}
 
 export function displayMessages(receivingUser, senderName, previousMessages) {
 
@@ -105,6 +132,8 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
 
     if (CurrentChat != receivingUser || !chat) {
         //EXECUTE NOTIFICATION!
+        console.log("okei!")
+        //displayNotification(receivingUser, currentUser.LoginName)
         return
     }
     if (previousMessages) {

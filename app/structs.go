@@ -4,6 +4,7 @@ type UserResponse struct {
 	UserID        int
 	UserName      string
 	LastMessageID int
+	Status        bool // online/offline status
 }
 
 type UserStruct struct {

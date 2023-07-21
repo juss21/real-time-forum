@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+
 	sqlDB "01.kood.tech/git/kasepuu/real-time-forum/database"
 )
 
@@ -31,15 +32,26 @@ func getUserNameByID(UserID int) (UserName string) {
 }
 
 func getAllUsers(uid int) (users []UserResponse) {
-	rows, _ := sqlDB.DataBase.Query("SELECT id, username FROM users WHERE id != ?", uid)
+	rows, _ := sqlDB.DataBase.Query("SELECT id, username FROM users WHERE id != ? ORDER BY username ", uid)
 	defer rows.Close()
 	for rows.Next() {
 		var user UserResponse
 		rows.Scan(&user.UserID, &user.UserName)
+		user.Status = getOnlineStatus(user.UserID)
 		users = append(users, user)
 	}
 	users = sortByLastMessage(users, uid)
 	return
+}
+func getOnlineStatus(userId int) (isOnline bool) {
+	isOnline = false
+	for o := 0; o < len(onlineUsersArray); o++ {
+		if onlineUsersArray[o] == userId {
+			isOnline = true
+			return isOnline
+		}
+	}
+	return isOnline
 }
 
 func sortByLastMessage(users []UserResponse, uid int) (sortedUsers []UserResponse) {
@@ -53,18 +65,19 @@ func sortByLastMessage(users []UserResponse, uid int) (sortedUsers []UserRespons
 			fmt.Println(err)
 		}
 		defer rows.Close()
-		
 
 		if rows.Next() {
 			var user UserResponse
 
 			user.UserID = users[i].UserID
 			user.UserName = users[i].UserName
+			user.Status = users[i].Status
+
 			rows.Scan(&user.LastMessageID)
 
 			sortedUsers = append(sortedUsers, user)
 		} else {
-			 sortedUsers = append(sortedUsers, users[i])
+			sortedUsers = append(sortedUsers, users[i])
 		}
 	}
 	sort.Slice(sortedUsers, func(i, j int) bool {
