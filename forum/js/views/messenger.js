@@ -6,6 +6,7 @@ let limit = 0;
 let scrolling = false;
 let scrollEnd = false;
 let prevScrollHeight;
+let timeOut;
 
 export function openMessenger() {
     messageBox = document.getElementById("messageBox")
@@ -152,14 +153,16 @@ export function displayIsWriting(sender, receiver) {
     if (receiver === currentUser.LoginName) { console.log("receiver on prg kasutaja", receiver, currentUser.LoginName); return }
     if (CurrentChat !== receiver || !chat) { console.log("currentchat on vale!", CurrentChat, sender); return }
 
+    clearTimeout(timeOut)
+
     let messageformat = `📱${receiver} is typing...`
 
     chatStatus.innerHTML = messageformat
 
      // Set a timeout to remove the notification after 10 seconds
-     setTimeout(function () {
+    timeOut = setTimeout(function () {
         chatStatus.innerHTML = ""
-    }, 2000); // 10000 milliseconds = 10 seconds
+    }, 1000);
     console.log("sending to:", sender)
     console.log("receiver:", receiver)
 }
@@ -328,7 +331,7 @@ const loadAdditionalMessages = (currentUser, receivingUser) => {
     }
 }
 
-function throttle(func, wait) {
+export function throttle(func, wait) {
     var lastEvent = 0
     return function () {
         var currentTime = new Date()
