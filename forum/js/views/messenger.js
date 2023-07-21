@@ -142,7 +142,7 @@ export function displayMessages(receivingUser, senderName, previousMessages, loa
     }
 
     if ((CurrentChat != receivingUser || !chat) && !loadall) {
-        displayNotification(receivingUser, currentUser.LoginName)
+        //displayNotification(receivingUser, currentUser.LoginName)
         return
     }
     if (!chat) return
