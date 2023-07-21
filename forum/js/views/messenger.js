@@ -94,31 +94,37 @@ export function updateUserList(senderUser, receivingUser = "") {
 
 export function displayNotification(sender, receiver) {
     if (sender) {
-        const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
-        const CurrentChat = localStorage.getItem("CurrentChat")
-        let message = `${receiver}, you have received a message from ${sender}! pleace check`
-
-        notificationHTML(message)
+        let message = `You received a message from ${sender}!`
+        notificationHTML(message, sender)
     }
 }
 
-function notificationHTML(message) {
-
-
+function notificationHTML(message, sender) {
     const notification = document.createElement("div")
     notification.className = "notificationBar"
 
     const textMessage = document.createElement("h1")
     textMessage.innerHTML = message
 
+    notification.addEventListener("click", ()=>{
+        console.log("kliklik")
+        if (!localStorage.getItem("CurrentChat")) localStorage.setItem("CurrentChat", sender)
+        else localStorage.setItem("CurrentChat", sender)
+
+        openMessenger()
+        const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
+        createChat(currentUser.LoginName, sender)
+    }) 
+
     notification.appendChild(textMessage)
 
     document.getElementById("app").appendChild(notification)
 
+
     // Set a timeout to remove the notification after 10 seconds
     setTimeout(function () {
         notification.remove();
-    }, 100000000); // 10000 milliseconds = 10 seconds
+    }, 10000); // 10000 milliseconds = 10 seconds
 }
 
 export function displayMessages(receivingUser, senderName, previousMessages, loadall = false) {

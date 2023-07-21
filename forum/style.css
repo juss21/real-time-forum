@@ -97,12 +97,18 @@ body {
 
 .notificationBar{
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: 25;
+  left: 10;
+  width: auto;
   text-align: center;
-  background-color: red;
-  color: yellow;
+  background-color: teal;
+  border: 5px solid aqua;
+  color: tomato;
+  border-radius: 5px;
+}
+.notificationBar h1{
+  display:flex;
+  font-size: x-large;
 }
 
 #openedPost {
