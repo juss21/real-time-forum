@@ -20,8 +20,8 @@ onlineusers -> colorid korda teha
 ###EXISTING USERS
 ```
 if you are too lazy, you can try out the forum using these premade accounts:
->user	|	 password
->123			  123
+>user	 password
+>123	    123
 >123aae		123
 ```
 
