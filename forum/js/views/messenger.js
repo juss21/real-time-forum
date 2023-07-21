@@ -93,7 +93,11 @@ export function updateUserList(senderUser, receivingUser = "") {
 }
 
 export function displayNotification(sender, receiver){
+    const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
+    const CurrentChat = localStorage.getItem("CurrentChat")
     let message = `${receiver}, you have received a message from ${sender}! pleace check`
+    
+    
 
 }
 
