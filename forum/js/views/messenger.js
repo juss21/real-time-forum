@@ -149,8 +149,8 @@ export function displayIsWriting(sender, receiver) {
     const chat = document.getElementById('chat')
     console.log("writing?")
     if (!chatStatus) return
-    if (receiver === currentUser.LoginName) { console.log("receiver on prg kasutaja", receiver, currentUser.LoginName); chatStatus.innerHTML = ""; return }
-    if (CurrentChat !== receiver || !chat) { console.log("currentchat on vale!", CurrentChat, sender); chatStatus.innerHTML = ""; return }
+    if (receiver === currentUser.LoginName) { console.log("receiver on prg kasutaja", receiver, currentUser.LoginName); return }
+    if (CurrentChat !== receiver || !chat) { console.log("currentchat on vale!", CurrentChat, sender); return }
 
     let messageformat = `📱${receiver} is typing...`
 
