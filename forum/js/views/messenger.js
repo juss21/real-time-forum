@@ -23,7 +23,7 @@ export function createMessageBox(element) {
 
 export function createUserList(userData, element) {
     if (document.getElementById("userList")) {
-        document.getElementById("userList").remove() 
+        document.getElementById("userList").remove()
     }
 
     const userList = document.createElement('div');
@@ -35,11 +35,11 @@ export function createUserList(userData, element) {
         const userName = userData[i].UserName;
         const userNameElement = document.createElement("div");
         userNameElement.textContent = userName;
-        userNameElement.id = userName 
+        userNameElement.id = userName
         userNameElement.className = "username"
 
         if (userData[i].Status) userNameElement.style.color = "yellow"
-        else userNameElement.style.color = "green" 
+        else userNameElement.style.color = "green"
 
         userNameElement.addEventListener("click", () => {
             localStorage.setItem("CurrentChat", userName)
@@ -58,7 +58,7 @@ function createCloseButton(element) {
 
     closeButton.addEventListener("click", () => {
         let openButton = document.getElementById("openButton")
-
+        localStorage.removeItem("CurrentChat")
         element.style.display = "none";
         openButton.style.display = "block";
     });
@@ -92,16 +92,17 @@ export function updateUserList(senderUser, receivingUser = "") {
     sendEvent("update_users", chatResponse)
 }
 
-export function displayNotification(sender, receiver){
-    const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
-    const CurrentChat = localStorage.getItem("CurrentChat")
-    let message = `${receiver}, you have received a message from ${sender}! pleace check`
-    
-    
+export function displayNotification(sender, receiver) {
+    if (sender) {
+        const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
+        const CurrentChat = localStorage.getItem("CurrentChat")
+        let message = `${receiver}, you have received a message from ${sender}! pleace check`
 
+        notificationHTML(message)
+    }
 }
 
-function notificationHTML(){
+function notificationHTML(message) {
 
 
     const notification = document.createElement("div")
@@ -114,13 +115,13 @@ function notificationHTML(){
 
     document.getElementById("app").appendChild(notification)
 
- // Set a timeout to remove the notification after 10 seconds
- setTimeout(function() {
-    notification.remove();
-}, 100000000); // 10000 milliseconds = 10 seconds
+    // Set a timeout to remove the notification after 10 seconds
+    setTimeout(function () {
+        notification.remove();
+    }, 100000000); // 10000 milliseconds = 10 seconds
 }
 
-export function displayMessages(receivingUser, senderName, previousMessages) {
+export function displayMessages(receivingUser, senderName, previousMessages, loadall = false) {
 
     const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
     const CurrentChat = localStorage.getItem("CurrentChat")
@@ -134,12 +135,12 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
         chatLog.innerHTML = "";
     }
 
-    if (CurrentChat != receivingUser || !chat) {
-        //EXECUTE NOTIFICATION!
-        console.log("okei!")
-        //displayNotification(receivingUser, currentUser.LoginName)
+    if ((CurrentChat != receivingUser || !chat) && !loadall) {
+        displayNotification(receivingUser, currentUser.LoginName)
         return
     }
+    if (!chat) return
+
     if (previousMessages) {
         previousMessages.forEach((loadedMessage) => {
             const message = document.createElement("div");

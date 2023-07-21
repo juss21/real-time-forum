@@ -244,7 +244,7 @@ func LoadOneMessageHandler(event Event, c *Client) error {
 			log.Println("SÕNUM SIIN:", responseData)
 			// sending data back to the client
 			var responseEvent Event
-			responseEvent.Type = EventLoadMessages
+			responseEvent.Type = EventOneMessage
 			responseEvent.Payload = response
 
 			client.egress <- responseEvent

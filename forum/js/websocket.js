@@ -59,7 +59,7 @@ const functionMap = { //USAGE: functionMap["send_message"]();
 export function loadMessage(data) {
     console.log("message:", data)
     displayMessages(data.ReceiverName, data.userName, data.Messages)
-    displayNotification(data.ReceiverName, data.userName)
+    //displayNotification(data.ReceiverName, data.userName)
 }
 
 export function loadPosts(data){
@@ -90,7 +90,7 @@ export function loadChat(data) {
     // const jsonString = JSON.stringify(data);
     console.log("messages:", data)
     //if (data.Messages === null || data.Messages === undefined) return
-    displayMessages(data.ReceiverName, data.userName, data.Messages)
+    displayMessages(data.ReceiverName, data.userName, data.Messages, true)
 }
 
 export function sendData(data) {
