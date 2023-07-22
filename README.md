@@ -20,6 +20,7 @@ loadAllMessages <-> loadMessage
 if you are too lazy, you can try out the forum using these premade accounts (123 is the password):
 > m2nky
 > 7Eleven
+> Isabella
 ```
 
 ###GOOD-TO-KNOW
