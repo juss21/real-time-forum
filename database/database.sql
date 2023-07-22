@@ -65,7 +65,7 @@ VALUES
   ('Technology'),
   ('Travel');
 
-INSERT INTO "chat" ("userId", "receiverId", "datesent", "message") 
+INSERT INTO "chat" ("userid", "receiverid", "datesent", "message") 
 VALUES 
   (1, 2, '2023-07-22 14:30', 'Hi 7Eleven, how are you?'),
   (2, 1, '2023-07-22 14:35', "Hey m2nky, I`m doing great.");
