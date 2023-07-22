@@ -1,4 +1,6 @@
 # REAL-TIME-FORUM    📚📚📚
+![Website Icon](https://01.kood.tech/git/kasepuu/real-time-forum/raw/branch/master/forum/images/icon.ico)
+
 ```
 TODO
 real-time communication laeb chatboxi kõik sõnumid ära <-ws->
