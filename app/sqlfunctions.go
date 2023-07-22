@@ -37,7 +37,7 @@ func getUserNameByID(UserID int) (UserName string) {
 }
 
 func getAllUsers(uid int) (users []UserResponse) {
-	rows, _ := sqlDB.DataBase.Query("SELECT id, username FROM users WHERE id != ? ORDER BY username ", uid)
+	rows, _ := sqlDB.DataBase.Query("SELECT id, username FROM users WHERE id != ? ORDER BY username", uid)
 	defer rows.Close()
 	for rows.Next() {
 		var user UserResponse
@@ -48,6 +48,7 @@ func getAllUsers(uid int) (users []UserResponse) {
 	users = sortByLastMessage(users, uid)
 	return
 }
+
 func getOnlineStatus(userId int) (isOnline bool) {
 	isOnline = false
 	for o := 0; o < len(onlineUsersArray); o++ {

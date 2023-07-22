@@ -26,7 +26,6 @@ func (m *wsManager) setupEventHandlers() {
 	m.handlers[EventGetOnlineMembers] = GetOnlineMembersHandler
 	m.handlers[EventSendMessage] = SendMessageHandler
 	m.handlers[EventLoadMessages] = LoadMessagesHandler
-	//m.handlers[EventOneMessage] = LoadOneMessageHandler
 	m.handlers[EventLoadPosts] = GetAllPosts
 	m.handlers[EventSortUsers] = SortUserList
 	m.handlers[EventIsTyping] = IsTypingHandler
@@ -169,7 +168,6 @@ func SendMessageHandler(event Event, c *Client) error {
 	outgoing.Message = sendMessage.Message
 	outgoing.ReceivingUser = sendMessage.ReceiverName
 	outgoing.UserName = sendMessage.SenderName
-
 
 	for client := range c.client.clients {
 		if client.userId == getUserId(sendMessage.ReceiverName) {

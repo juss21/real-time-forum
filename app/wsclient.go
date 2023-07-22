@@ -1,5 +1,4 @@
-//  https://www.youtube.com/watch?v=pKpKv9MKN-E&ab_channel=ProgrammingPercy
-
+// https://www.youtube.com/watch?v=pKpKv9MKN-E&ab_channel=ProgrammingPercy
 package app
 
 import (
@@ -17,10 +16,10 @@ var pingInterval = (pongWait * 9) / 10
 type ClientList map[*Client]bool
 
 type Client struct {
-	//
 	connection *websocket.Conn
 	client     *wsManager
 	userId     int
+
 	// unbuffered channel, to prevent connection getting too many connections
 	egress chan Event // avoid concurrent writes on the websocket connection
 }

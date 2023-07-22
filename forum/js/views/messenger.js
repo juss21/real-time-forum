@@ -177,7 +177,7 @@ export function displayMessages(receivingUser, senderName, previousMessages) {
             message.id = "message";
         
             // Replace newline characters with <br> tags and use textContent to prevent HTML injection
-            const messageContent = loadedMessage.Message.replace(/\n/g, '<br>');
+            const messageContent = loadedMessage.Message.trimEnd().replace(/\n/g, '<br>');
         
             if (loadedMessage.UserName === currentUser.LoginName) {
                 message.className = "messenger_currentUser";
@@ -274,28 +274,30 @@ function createTextArea(currentUser, receivingUser) {
 async function sendMessage(Message, Sender, Receiver) {
     const chatArea = document.getElementById('chatLog')
     const textArea = document.getElementById('textBox')
-    const message = Message.trimEnd().replace(/\\n/g, "<br>")
-    console.log(message,"<TO BE SENT")
-    if (message != "") {
+    const trimmed_message = Message.trimEnd().replace(/\n/g, "<br>")
+    const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
+
+    if (trimmed_message != "") {
         const message = document.createElement("div");
         message.id = "message";
 
         const currentDate = new Date();
-        const currentHour = currentDate.getHours();
-        const currentMinute = currentDate.getMinutes();
+        const currentHour = currentDate.getHours().toString().padStart(2, '0');
+        const currentMinute = currentDate.getMinutes().toString().padStart(2, '0');
 
             message.className = "messenger_currentUser";
             message.innerHTML =
                 `<span class="dateColor">${currentHour}:${currentMinute}</span> ` +
                 `<span class="nameColor">${Sender}</span> <span class="separatorColor">:</span> ` +
-                `<span class="messageColor">${Message}</span>`;
+                `<span class="messageColor">${trimmed_message}</span>`;
     
         const chatMessage = {
-            Message: Message,
+            Message: trimmed_message,
             SenderName: Sender,
             ReceiverName: Receiver,
         };
         sendEvent("send_message", chatMessage)
+        updateUserList(currentUser.LoginName)
         chatArea.appendChild(message)
 
         textArea.value = "";

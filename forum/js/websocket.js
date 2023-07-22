@@ -8,7 +8,88 @@ export class Event {
     }
 }
 
+export function wsAddConnectiong() {
+    if (window["WebSocket"]) {
+        let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"));
+        const wsURL = `ws://${document.location.host}/ws?UserID=${currentUser.UserID}`;
+
+        console.log("WSCONNECTION!")
+
+        if (!window.socket || window.socket.readyState === WebSocket.CLOSED) {
+            const ws = new WebSocket(wsURL);
+
+            ws.onopen = () => {
+                console.log("WebSocket Connection established!");
+            };
+
+            ws.onmessage = (e) => {
+                console.log("WebSocket Message attempt");
+                const eventData = JSON.parse(e.data);
+                const event = Object.assign(new Event(), eventData);
+                routeEvent(event);
+            };
+
+            ws.onclose = (e) => {
+                console.log("WebSocket connection Lost!", e);
+            };
+
+            window.socket = ws;
+
+            // Store the WebSocket URL in sessionStorage to re-establish the connection on refresh.
+            sessionStorage.setItem("WebSocketURL", wsURL);
+
+            window.addEventListener("beforeunload", function () {
+                ws.close();
+            });
+        } else if (window.socket.readyState === WebSocket.CONNECTING) {
+            // WebSocket is in the process of connecting, you can wait here until it's connected.
+            console.log("WebSocket is connecting...");
+        } else {
+            // WebSocket is already open and connected.
+            console.log("WebSocket is already connected!");
+        }
+    } else {
+        alert("This browser does not support websockets!");
+    }
+}
+
 export function wsAddConnection() {
+    return new Promise((resolve, reject) => {
+        if (window["WebSocket"]) {
+            if (window.socket) window.socket.close();
+
+            let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"));
+            const ws = new WebSocket(`ws://${document.location.host}/ws?UserID=${currentUser.UserID}`);
+
+            ws.onopen = () => {
+                console.log("WebSocket Connection established!");
+                resolve(ws); // Resolve the promise with the WebSocket object when the connection is established.
+            };
+
+            ws.onmessage = (e) => {
+                console.log("WebSocket Message attempt");
+                const eventData = JSON.parse(e.data);
+                const event = Object.assign(new Event, eventData);
+                routeEvent(event);
+            };
+
+            ws.onclose = (e) => {
+                console.log("WebSocket connection Lost!", e);
+            };
+
+            window.socket = ws;
+
+            window.addEventListener("beforeunload", function () {
+                ws.close();
+            });
+        } else {
+            alert("This browser does not support websockets!");
+            reject(new Error("WebSocket not supported"));
+        }
+    });
+}
+
+export function wsAddConnection_existing() {
     if (window["WebSocket"]) {
 
         if (window.socket) window.socket.close()
@@ -91,19 +172,26 @@ export function sendData(data) {
     console.log("Sent:", jsonString)    
 }
 
-export function waitForWSConnection(socket, cb, counter = 30) {
-    setTimeout(
-        function () {
-            if (socket && socket.readyState === 1) {
-                console.log("WebSocket is connected!")
+export function waitForWSConnection(cb, counter = 30) {
+    setTimeout(function () {
+        const socketURL = sessionStorage.getItem("WebSocketURL");
+        console.log(socketURL);
+        if (socketURL) {
+            const socket = new WebSocket(socketURL);
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                console.log("WebSocket is connected!");
+                window.socket = socket; // Update the global socket variable with the re-established connection.
                 if (cb != null) {
-                    cb()
+                    cb();
                 }
             } else {
-                wsAddConnection()
-                console.log("Waiting for connection...")
-                if (counter > 0) waitForWSConnection(socket, cb, counter - 1)
-                else window.location.href = "/login"
+                console.log("Waiting for connection...");
+                if (counter > 0) waitForWSConnection(cb, counter - 1);
+                else window.location.href = "/login";
             }
-        }, 100);
+        } else {
+            console.log("WebSocket URL not found in sessionStorage.");
+            window.location.href = "/login"; // Redirect to login or handle the case when the WebSocket URL is not found.
+        }
+    }, 100);
 }

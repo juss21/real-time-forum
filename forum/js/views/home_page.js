@@ -83,21 +83,24 @@ function homeHTML(currentUser) {
         `
 }
 
+async function connectAndSendEvents(currentUser) {
+    try {
+        const websocket = await wsAddConnection(); // Wait for the WebSocket connection to be established
+
+        // websocket events that will be sent on connection
+        sendEvent("get_online_members", `log-in-${currentUser.UserID}`);
+        sendEvent("load_posts", currentUser.UserID);
+        sendEvent("update_users", "other Login");
+    } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+    }
+}
 
 export default async function () {
     const isAuthenticated = await hasSession()
     if (isAuthenticated) {
-        wsAddConnection()
-        console.log(window.socket, "SIIINnnsndan")
-        let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
-
-        // websocket events that will be sent on connection
-        waitForWSConnection(window.socket, () => {
-            sendEvent("get_online_members", `log-in-${currentUser.UserID}`) //getOnlineUsers() <- previously
-            sendEvent("load_posts", currentUser.UserID)
-            sendEvent("update_users", "other Login")
-        })
-
+        let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"));
+        connectAndSendEvents(currentUser)
         homeHTML(currentUser)
         document.title = "Home"
 
@@ -219,8 +222,8 @@ function verifyFormNewPost() {
     let categorySelect = document.getElementById("category");
     let categoryErrorDiv = document.getElementById("CreatePost_Error_Categories");
 
-    categorySelect.addEventListener("change", ()=> {
-        if (categorySelect.value === ""){
+    categorySelect.addEventListener("change", () => {
+        if (categorySelect.value === "") {
             categoryErrorDiv.innerHTML = "Please select a category!"
         } else {
             categoryErrorDiv.innerHTML = ""

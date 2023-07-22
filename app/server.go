@@ -31,7 +31,6 @@ func StartServer(port string) {
 	http.HandleFunc("/hasCookie", HasCookieHandler)
 
 	// miscellaneous
-	// http.HandleFunc("/get-posts", GetPostListHandler)
 	http.HandleFunc("/get-comments", SendCommentList)
 	http.HandleFunc("/new-post", AddPostHandler)
 	http.HandleFunc("/new-comment", AddCommentHandler)
