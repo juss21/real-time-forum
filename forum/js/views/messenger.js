@@ -26,6 +26,7 @@ export function createUserList(userData, element) {
     if (document.getElementById("userList")) {
         document.getElementById("userList").remove()
     }
+    limit = 0
 
     const userList = document.createElement('div');
     userList.className = "messageUsers";
