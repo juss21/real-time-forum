@@ -1,23 +1,22 @@
 # REAL-TIME-![Website Icon](https://01.kood.tech/git/kasepuu/real-time-forum/raw/branch/master/forum/images/icon.ico)ORUM   
 
-
 ```
 TODO
 real-time communication laeb chatboxi kõik sõnumid ära <-ws->
 loadAllMessages <-> loadMessage
 ```
 
-##ABOUT
+## ABOUT
 * ####This is real-time-forum project, that must have:
 * a working real-time chat
 * ability to post, comment
 
-##USAGE
+## USAGE
 ```
  go run . <port> // port is optional, this will be 8080 by default
 ```
 
-###EXISTING USERS
+### EXISTING USERS
 ```
 if you are too lazy, you can try out the forum using these premade accounts (123 is the password):
 > m2nky
@@ -25,14 +24,14 @@ if you are too lazy, you can try out the forum using these premade accounts (123
 > Isabella
 ```
 
-###GOOD-TO-KNOW
+### GOOD-TO-KNOW
 ```
 CHAT indicators:
  🟢online
  ⚪offline
 ```
 
-#####MAIN-REQUIREMENTS
+##### MAIN-REQUIREMENTS
 ```
 sqlite3, golang support
 ```
