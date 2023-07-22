@@ -2,8 +2,7 @@
 
 ```
 TODO
-real-time communication laeb chatboxi kõik sõnumid ära <-ws->
-loadAllMessages <-> loadMessage
+websocket f5 connecting loop
 ```
 
 ## ABOUT
