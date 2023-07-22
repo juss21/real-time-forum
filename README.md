@@ -24,7 +24,7 @@ if you are too lazy, you can try out the forum using these premade accounts (123
 > Isabella
 ```
 
-### GOOD-TO-KNOW
+### GOOD TO KNOW
 ```
 CHAT indicators:
  🟢online
