@@ -75,16 +75,13 @@ export async function routeEvent(event) {
 
 export function loadOnlineMembers(data) {
     document.getElementById("onlineMembers").innerHTML = data.length + "👥"
-   // createUserList(sessionStorage.getItem("CurrentUser").UserID, data) // create user list >HERE<
+    document.getElementById("openButton").innerHTML = `Messenger ${data.length-1}🌐`
 }
 export function updateUserList(data) {
     if (document.getElementById("messageBox").innerHTML != "") createUserList(data, document.getElementById("messageBox"))
 }
 
 export function loadChat(data) {
-    // const jsonString = JSON.stringify(data);
-    console.log("messages:", data)
-    //if (data.Messages === null || data.Messages === undefined) return
     displayMessages(data.ReceiverName, data.userName, data.Messages, true)
 }
 

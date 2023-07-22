@@ -3,7 +3,6 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -54,6 +53,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	var nicknameB, emailB bool
 	var passwordB = strings.TrimSpace(registerInfo.Password) == ""
+	var genderB = registerInfo.Gender == ""
 
 	err1 := sqlDB.DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(username) = lower(?))", registerInfo.Username).Scan(&nicknameB)
 	err2 := sqlDB.DataBase.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE lower(email) = lower(?))", registerInfo.Email).Scan(&emailB)
@@ -67,6 +67,8 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 				responseMessage = "email"
 			} else if passwordB {
 				responseMessage = "passwd"
+			} else if genderB {
+				responseMessage = "gendr"
 			}
 
 			w.WriteHeader(http.StatusBadRequest)
@@ -98,7 +100,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	userId := r.URL.Query().Get("UserID")
 	currentSession := "session-" + userId
-	fmt.Println(userId, currentSession)
 	http.SetCookie(w, &http.Cookie{
 		Name:   currentSession,
 		Value:  "0",

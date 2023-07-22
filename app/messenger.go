@@ -59,7 +59,7 @@ func LoadMessages(sqlSentence string, userName string, receiverName string, limi
 		rows.Scan(&sender, &receiver, &messageData.MessageDate, &messageData.Message)
 		messageDateTime, err := time.Parse(time.RFC3339Nano, messageData.MessageDate)
 		if err == nil {
-			messageData.MessageDate = messageDateTime.Format("15:04:05")
+			messageData.MessageDate = messageDateTime.Format("15:04")
 		}
 
 		messageData.UserName = getUserNameByID(sender)

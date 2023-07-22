@@ -4,7 +4,9 @@ export default function () {
     document.title = "Login"
 
     document.getElementById("app").innerHTML = `
-    <form id="loginForm" action="javascript:" method="POST" class="home">
+    <div class="login">
+
+    <form id="loginForm" action="javascript:" method="POST">
     <br>
     <h1>Login page</h1>    
     <br>
@@ -20,7 +22,9 @@ export default function () {
 
 
     <a href="/register" class="nav__link" [data-link]="">Create a new account!</a>
+  
     </form>
+    </div>
     `;
 
     loginListener()

@@ -126,7 +126,6 @@ function notificationHTML(message, sender) {
     })
 
     notificationMessage.addEventListener("click", () => {
-        console.log("kliklik")
         if (!localStorage.getItem("CurrentChat")) localStorage.setItem("CurrentChat", sender)
         else localStorage.setItem("CurrentChat", sender)
         openMessenger()
@@ -275,7 +274,6 @@ function createTextArea(currentUser, receivingUser) {
         if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
             limit++
-            console.log("Enter keypress>", currentUser, receivingUser)
             sendMessage(textArea.value, currentUser, receivingUser) // send message to server
             textArea.value = "";
             return

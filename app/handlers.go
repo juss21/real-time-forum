@@ -52,8 +52,9 @@ func AddPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	var emptyTitle = strings.TrimSpace(newPostInfo.Title) == ""
 	var emptyContent = strings.TrimSpace(newPostInfo.Content) == ""
+	var emptyCategory = strings.TrimSpace(newPostInfo.Categories) == ""
 
-	if emptyTitle || emptyContent {
+	if emptyTitle || emptyContent || emptyCategory {
 		log.Println("Error creating a comment! Empty content!")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(newPostInfo.Title + " " + newPostInfo.Content))
@@ -62,9 +63,9 @@ func AddPostHandler(w http.ResponseWriter, r *http.Request) {
 
 		statement, _ := sqlDB.DataBase.Prepare("INSERT INTO posts (userId, title, content, categoryId, date) VALUES (?,?,?,?,?)")
 
-		currentTime := time.Now().Format("02.01.2006 15:04")
+		currentTime := time.Now().Format(time.RFC3339Nano)
 
-		_, erro := statement.Exec(userId, newPostInfo.Title, newPostInfo.Content, 2, currentTime)
+		_, erro := statement.Exec(userId, newPostInfo.Title, newPostInfo.Content, getCategoryFromName(newPostInfo.Categories), currentTime)
 		if erro != nil {
 			log.Println("SQL [ERROR]: one per user")
 		}
@@ -91,7 +92,7 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		statement, _ := sqlDB.DataBase.Prepare("INSERT INTO comments (userId, postId, content, datecommented) VALUES (?,?,?,?)")
 
-		currentTime := time.Now().Format("02.01.2006 15:04")
+		currentTime := time.Now().Format(time.RFC3339Nano)
 
 		_, erro := statement.Exec(userId, newCommentInfo.PostID, newCommentInfo.Content, currentTime)
 		if erro != nil {

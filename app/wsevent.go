@@ -151,6 +151,7 @@ func SortUserList(event Event, c *Client) error {
 const EventSendMessage = "send_message"
 
 func SendMessageHandler(event Event, c *Client) error {
+
 	var sendMessage SendMessageEvent
 
 	if err := json.Unmarshal(event.Payload, &sendMessage); err != nil {

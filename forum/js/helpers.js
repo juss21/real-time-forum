@@ -42,7 +42,6 @@ export async function getOnlineUsers() {
         const response = await fetch(url);
 
         if (response.ok) {
-            console.log(response)
             let data = await response.json();
             document.getElementById("onlineMembers").innerHTML = data.Amount + "👥"
         } else {

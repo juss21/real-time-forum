@@ -5,16 +5,16 @@ import { fetchComments } from "./postComment.js";
 import { sendEvent } from "../websocket.js";
 import { wsAddConnection } from "../websocket.js";
 import { waitForWSConnection } from "../websocket.js";
-function homeHTML(currentUser){
+function homeHTML(currentUser) {
     document.getElementById("app").innerHTML = `
         <nav class="nav">
         <a class="nav__link" id="onlineMembers"></a>
         <a class="nav__link">Welcome, ${currentUser.LoginName}!</a>
-        <a href="/" class="nav__link" data-link>Home</a>
+        <!--a href="/" class="nav__link" data-link>Home</a-->
         <a href="/logout" class="nav__link" data-link>Logout</a>
          </nav>
         <div id="home" class="home">
-                <h1>Our forum!</h1>
+                <h1>FORUM</h1>
                 <button id="openPostSection" class="openPostBTN">New post</button>
         </div>
 
@@ -29,8 +29,14 @@ function homeHTML(currentUser){
         <a id="CreatePost_Error_Title">Title is too short!</a><br>
         <textarea placeholder="Content" name="post_content" id="newPostBox_content" class="newPostBox_content"></textarea><br>
         <a id="CreatePost_Error_Content">Content is non-existent!</a><br>
-        <textarea placeholder="Categories" name="post_categories" id="newPostBox_categories" class="newPostBox_categories"></textarea><br>
-        <a id="CreatePost_Error_Categories">Please select at least one category!</a><br>
+        <label for="category" style="color:white;"></label>
+        <select id="category" name="post_categories" required>
+            <option value="" disabled selected>Select a category</option>
+            <option value="Nature">Nature</option>
+            <option value="Software">Software</option>
+            <option value="Hardware">Hardware</option>
+        </select><br>       
+        <a id="CreatePost_Error_Categories">Please select a category!</a><br>
         <button type="submit" class="addPostButton" id="newPostBTN">Create post!</button>
         </form></div>
 
@@ -88,7 +94,7 @@ export default async function () {
         // websocket events that will be sent on connection
         waitForWSConnection(window.socket, () => {
             sendEvent("get_online_members", `log-in-${currentUser.UserID}`) //getOnlineUsers() <- previously
-            sendEvent("load_posts", currentUser.UserID)         
+            sendEvent("load_posts", currentUser.UserID)
             sendEvent("update_users", "other Login")
         })
 
@@ -101,6 +107,7 @@ export default async function () {
         document.getElementById("postCloseBTN").addEventListener("click", () => {
             document.getElementById("openedPost").style.display = "none";
             localStorage.removeItem("OpenedPostID")
+            document.title = "Home"
         })
 
         document.getElementById("commentboxCloseBTN").addEventListener("click", () => {
@@ -125,8 +132,8 @@ export default async function () {
         addEventListener("keyup", (e) => {
             if (e.key === "Escape" && document.getElementById("openedPost").style.display !== "none" && document.getElementById("newCommentSection").style.display === "none") {
                 document.getElementById("openedPost").style.display = "none";
-            } 
-            
+            }
+
             if (e.key === "Escape" && document.getElementById("newCommentSection").style.display !== "none" && document.getElementById("openedPost").style.display !== "none") {
                 document.getElementById("newCommentSection").style.display = "none";
             }
@@ -147,7 +154,6 @@ function newPostListener() {
     verifyFormNewPost()
     section.addEventListener("submit", async (e) => {
         if (isValid()) {
-            console.log("New post attempt:", "succeeded!")
             e.preventDefault()
             let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
 
@@ -193,10 +199,10 @@ function isValid() {
 }
 
 function verifyFormNewPost() {
-    let postSetup = ["newPostBox_title", "newPostBox_content", "newPostBox_categories"]
+    let postSetup = ["newPostBox_title", "newPostBox_content"]
     let minLength = [3, 10, 1]
-    let errorMsg1 = ["Title is too short!", "Content is non-existent!", "Please select at least one category!"]
-    let errorDiv = ["CreatePost_Error_Title", "CreatePost_Error_Content", "CreatePost_Error_Categories"]
+    let errorMsg1 = ["Title is too short!", "Content is non-existent!"]
+    let errorDiv = ["CreatePost_Error_Title", "CreatePost_Error_Content"]
 
     for (let i = 0; i < postSetup.length; i++) {
         let id = postSetup[i]
@@ -209,6 +215,18 @@ function verifyFormNewPost() {
             }
         })
     }
+
+    let categorySelect = document.getElementById("category");
+    let categoryErrorDiv = document.getElementById("CreatePost_Error_Categories");
+
+    categorySelect.addEventListener("change", ()=> {
+        if (categorySelect.value === ""){
+            categoryErrorDiv.innerHTML = "Please select a category!"
+        } else {
+            categoryErrorDiv.innerHTML = ""
+        }
+    })
+
 }
 
 function verifyFormNewComment() {
@@ -231,7 +249,6 @@ function newCommentListener() {
 
     section.addEventListener("submit", async (e) => {
         if (document.getElementById("CreateCommentError").innerHTML === "") {
-            console.log("New comment attempt:", "succeeded!")
             let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
 
             e.preventDefault()

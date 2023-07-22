@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"time"
 
 	sqlDB "01.kood.tech/git/kasepuu/real-time-forum/database"
 )
@@ -18,6 +19,10 @@ func getUserName(userId int) (UserName string) {
 }
 func getCategoryFromID(id int) (category string) {
 	sqlDB.DataBase.QueryRow("SELECT name FROM category WHERE id = ?", id).Scan(&category)
+	return category
+}
+func getCategoryFromName(id string) (category int) {
+	sqlDB.DataBase.QueryRow("SELECT id FROM category WHERE name = ?", id).Scan(&category)
 	return category
 }
 
@@ -114,7 +119,10 @@ func getAllPosts() (posts []PostResponse) {
 		var post PostResponse
 		var categoryId int
 		rows.Scan(&post.PostID, &post.OriginalPosterID, &post.Title, &post.Content, &categoryId, &post.Date)
-
+		messageDateTime, err := time.Parse(time.RFC3339Nano, post.Date)
+		if err == nil {
+			post.Date = messageDateTime.Format("02.01.2006 15:04")
+		}
 		post.OriginalPoster = getUserName(post.OriginalPosterID)
 		post.Category = getCategoryFromID(categoryId)
 		posts = append(posts, post)
@@ -132,7 +140,12 @@ func getAllComments(postId int) (postData PostResponse, comments []CommentRespon
 
 	for rows.Next() {
 		var comment CommentResponse
+
 		rows.Scan(&comment.CommentID, &comment.OriginalPosterID, &comment.Content, &comment.Date)
+		messageDateTime, err := time.Parse(time.RFC3339Nano, comment.Date)
+		if err == nil {
+			comment.Date = messageDateTime.Format("02.01.2006 15:04")
+		}
 		comment.PostID = postId
 		comment.OriginalPoster = getUserName(comment.OriginalPosterID)
 		comments = append(comments, comment)
@@ -146,6 +159,11 @@ func getAllComments(postId int) (postData PostResponse, comments []CommentRespon
 
 	for row.Next() {
 		row.Scan(&postData.OriginalPosterID, &postData.Title, &postData.Content, &postData.Category, &postData.Date)
+
+		messageDateTime, err := time.Parse(time.RFC3339Nano, postData.Date)
+		if err == nil {
+			postData.Date = messageDateTime.Format("02.01.2006 15:04")
+		}
 		postData.OriginalPoster = getUserName(postData.OriginalPosterID)
 	}
 

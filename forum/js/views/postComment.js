@@ -62,7 +62,6 @@ function handlePostClick(event) {
 }
 
 export async function fetchComments(postId) {
-    // console.log("fetching comments for: ", postId)
     try {
         const url = `/get-comments?PostID=${postId}`;
         const response = await fetch(url);
@@ -79,6 +78,8 @@ export async function fetchComments(postId) {
 }
 
 function openPost(postId, data) {
+    document.title = `Post-${postId}`
+
     let element = document.getElementById("openedPost")
     element.style.display = "inline"
     element.className = `post-${postId}`
