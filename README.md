@@ -20,8 +20,8 @@ onlineusers -> colorid korda teha
 ###EXISTING USERS
 ```
 if you are too lazy, you can try out the forum using these premade accounts (123 is the password):
->m2nky
->7Eleven
+> m2nky
+> 7Eleven
 ```
 
 ###GOOD-TO-KNOW
