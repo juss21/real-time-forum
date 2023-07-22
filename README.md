@@ -3,9 +3,6 @@
 TODO
 real-time communication laeb chatboxi kõik sõnumid ära <-ws->
 loadAllMessages <-> loadMessage
-database.sql -> database creation CREATE IF ...
-onlineusers -> colorid korda teha
-loginid -> prg case sensitive FIX PLS
 ```
 
 ##ABOUT

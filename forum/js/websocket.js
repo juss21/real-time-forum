@@ -57,11 +57,6 @@ function updateIsTyping(data){
     displayIsWriting(data.receivingUser, data.currentUser)
 }
 
-export function loadMessage(data) {
-    displayMessages(data.ReceiverName, data.userName, data.Messages)
-    //displayNotification(data.ReceiverName, data.userName)
-}
-
 export function loadPosts(data){
    createPostHtml(data)
 }
@@ -91,6 +86,11 @@ export function loadChat(data) {
     console.log("messages:", data)
     //if (data.Messages === null || data.Messages === undefined) return
     displayMessages(data.ReceiverName, data.userName, data.Messages, true)
+}
+
+export function loadMessage(data) {
+    displayMessages(data.ReceiverName, data.userName, data.Messages)
+    //displayNotification(data.ReceiverName, data.userName)
 }
 
 export function sendData(data) {

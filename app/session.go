@@ -21,7 +21,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	var password string
 	var userId int
-	rows := sqlDB.DataBase.QueryRow("SELECT password, id FROM users WHERE username = ? OR email = ?", loginInfo.Login, loginInfo.Login)
+	rows := sqlDB.DataBase.QueryRow("SELECT password, id FROM users WHERE LOWER(username) = ? OR LOWER(email) = ?", strings.ToLower(loginInfo.Login), strings.ToLower(loginInfo.Login))
 	scanErr := rows.Scan(&password, &userId)
 
 	// on bad password
@@ -33,7 +33,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// on success
 	response := LoginResponse{
-		LoginName: loginInfo.Login,
+		LoginName: getUserName(userId),
 		UserID:    getUserId(loginInfo.Login),
 		CookieKey: createCookie(w, loginInfo.Login),
 	}
