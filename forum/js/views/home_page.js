@@ -88,7 +88,7 @@ export default async function () {
     const isAuthenticated = await hasSession()
     if (isAuthenticated) {
         wsAddConnection()
-
+        console.log(window.socket, "SIIINnnsndan")
         let currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
 
         // websocket events that will be sent on connection

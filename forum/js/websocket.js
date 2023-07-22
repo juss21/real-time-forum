@@ -1,5 +1,5 @@
 // WEBSOCKET
-import { createUserList, displayMessages, displayIsWriting } from "./views/messenger.js"
+import { createUserList, displayMessages, displayIsWriting, newMessage } from "./views/messenger.js"
 import { createPostHtml } from "./views/postComment.js"
 export class Event {
     constructor(type, payload) {
@@ -46,11 +46,11 @@ const functionMap = {
     //USAGE: functionMap["send_message"]();
     "send_message": sendData,
     "load_all_messages": loadChat,
-    "load_message": loadMessage,
     "load_posts": loadPosts,
     "update_users": updateUserList,
     "get_online_members": loadOnlineMembers,
     "is_typing": updateIsTyping,
+    "new_message": newMessage
 };
 
 function updateIsTyping(data){
@@ -82,19 +82,13 @@ export function updateUserList(data) {
 }
 
 export function loadChat(data) {
-    displayMessages(data.ReceiverName, data.userName, data.Messages, true)
+    displayMessages(data.ReceiverName, data.userName, data.Messages)
 }
 
-export function loadMessage(data) {
-    displayMessages(data.ReceiverName, data.userName, data.Messages)
-    //displayNotification(data.ReceiverName, data.userName)
-}
 
 export function sendData(data) {
     const jsonString = JSON.stringify(data);
-    console.log("Sent:", jsonString)
-    //loadChat(data)
-    
+    console.log("Sent:", jsonString)    
 }
 
 export function waitForWSConnection(socket, cb, counter = 30) {
@@ -106,6 +100,7 @@ export function waitForWSConnection(socket, cb, counter = 30) {
                     cb()
                 }
             } else {
+                wsAddConnection()
                 console.log("Waiting for connection...")
                 if (counter > 0) waitForWSConnection(socket, cb, counter - 1)
                 else window.location.href = "/login"

@@ -1,12 +1,13 @@
-import { routeEvent, loadChat, sendEvent } from "../websocket.js";
+import { sendEvent } from "../websocket.js";
 import { hasSession } from "../helpers.js";
 
 let messageBox;
-let limit = 0;
+var limit = 0;
 let scrolling = false;
 let scrollEnd = false;
 let prevScrollHeight;
 let timeOut;
+
 
 export function openMessenger() {
     messageBox = document.getElementById("messageBox")
@@ -26,7 +27,6 @@ export function createUserList(userData, element) {
     if (document.getElementById("userList")) {
         document.getElementById("userList").remove()
     }
-    limit = 0
 
     const userList = document.createElement('div');
     userList.className = "messageUsers";
@@ -40,13 +40,10 @@ export function createUserList(userData, element) {
         userNameElement.id = userName
         userNameElement.className = "username"
 
-        if (userData[i].Status) userNameElement.className = userNameElement.className + " " + "online" 
-        else userNameElement.className = userNameElement.className + " " + "offline" 
-
-        if (localStorage.getItem("CurrentChat")) createChat(currentUser.LoginName, localStorage.getItem("CurrentChat"))
+        if (userData[i].Status) userNameElement.className = userNameElement.className + " " + "online"
+        else userNameElement.className = userNameElement.className + " " + "offline"
 
         userNameElement.addEventListener("click", () => {
-            localStorage.setItem("CurrentChat", userName)
             createChat(currentUser.LoginName, userName)
         });
         userList.appendChild(userNameElement)
@@ -75,16 +72,15 @@ export function loadAllMessages(senderUser, receivingUser, limit) {
         receivingUser: receivingUser,
         limit: limit
     };
-    sendEvent("load_all_messages", chatResponse)
+    sendEvent("load_all_messages", chatResponse) 
 }
 
-export function loadMessage(senderUser, receivingUser, limit) {
-    const chatResponse = {
-        userName: senderUser,
-        receivingUser: receivingUser,
-        limit: limit
-    };
-    sendEvent("load_message", chatResponse)
+export async function newMessage(data) {
+    loadAllMessages(data.ReceivingUser, data.UserName, limit)
+    if (localStorage.getItem("CurrentChat") != data.UserName ||
+        !document.getElementById("chat")) displayNotification(data.UserName, data.ReceivingUser)
+
+    updateUserList(data.UserName, data.ReceivingUser)
 }
 
 export function updateUserList(senderUser, receivingUser = "") {
@@ -126,9 +122,8 @@ function notificationHTML(message, sender) {
     })
 
     notificationMessage.addEventListener("click", () => {
-        if (!localStorage.getItem("CurrentChat")) localStorage.setItem("CurrentChat", sender)
-        else localStorage.setItem("CurrentChat", sender)
         openMessenger()
+        createChat(JSON.parse(sessionStorage.getItem("CurrentUser")).LoginName, sender)
         notificationDIV.remove();
     })
 
@@ -148,7 +143,7 @@ export function displayIsWriting(sender, receiver) {
     const chatStatus = document.getElementById("chat-status")
 
     const chat = document.getElementById('chat')
-    
+
     if (!chatStatus) return
     if (receiver === currentUser.LoginName) { return }
     if (CurrentChat !== receiver || !chat) { return }
@@ -164,43 +159,38 @@ export function displayIsWriting(sender, receiver) {
     }, 1000);
 }
 
-export function displayMessages(receivingUser, senderName, previousMessages, loadall = false) {
+export function displayMessages(receivingUser, senderName, previousMessages) {
 
     const currentUser = JSON.parse(sessionStorage.getItem("CurrentUser"))
-    const CurrentChat = localStorage.getItem("CurrentChat")
 
     const chat = document.getElementById('chat')
     const chatLog = document.getElementById('chatLog')
+    if (!chat) return
     if (chatLog) {
+        chatLog.innerHTML = "";
         chatLog.className = "messages"
     }
-    if (chatLog && scrolling) {
-        chatLog.innerHTML = "";
-    }
-
-    if ((CurrentChat != receivingUser || !chat) && !loadall) {
-        displayNotification(receivingUser, currentUser.LoginName)
-        return
-    }
-    if (!chat) return
 
     if (previousMessages) {
         previousMessages.forEach((loadedMessage) => {
             const message = document.createElement("div");
             message.id = "message";
-
+        
+            // Replace newline characters with <br> tags and use textContent to prevent HTML injection
+            const messageContent = loadedMessage.Message.replace(/\n/g, '<br>');
+        
             if (loadedMessage.UserName === currentUser.LoginName) {
                 message.className = "messenger_currentUser";
                 message.innerHTML =
                     `<span class="dateColor">${loadedMessage.MessageDate}</span> ` +
                     `<span class="nameColor">${loadedMessage.UserName}</span> <span class="separatorColor">:</span> ` +
-                    `<span class="messageColor">${loadedMessage.Message}</span>`;
+                    `<span class="messageColor">${messageContent}</span>`;
             } else {
                 message.className = "messenger_receivingUser";
                 message.innerHTML =
                     `<span class="dateColor">${loadedMessage.MessageDate}</span> ` +
                     `<span class="nameColor">${loadedMessage.UserName}</span> <span class="separatorColor">:</span> ` +
-                    `<span class="messageColor">${loadedMessage.Message}</span>`;
+                    `<span class="messageColor">${messageContent}</span>`;
             }
             chatLog.appendChild(message);
         });
@@ -209,7 +199,7 @@ export function displayMessages(receivingUser, senderName, previousMessages, loa
         chatLog.scrollTop = chatLog.scrollHeight
     } else {
         chatLog.scrollTop = chatLog.scrollHeight - prevScrollHeight
-        if (limit > previousMessages.length) {
+        if (limit > (previousMessages ? previousMessages.length : 0)) {
             scrollEnd = true
         }
         scrolling = false
@@ -219,10 +209,11 @@ export function displayMessages(receivingUser, senderName, previousMessages, loa
 export function createChat(currentUser, receivingUser) {
     if (document.getElementById("chat")) {
         document.getElementById("chat").remove()
-        scrolling = false;
-        scrollEnd = false;
-        prevScrollHeight = 0
     }
+    localStorage.setItem("CurrentChat", receivingUser)
+    scrolling = false;
+    scrollEnd = false;
+    prevScrollHeight = 0
     limit = 10
 
     const chat = document.createElement("div");
@@ -253,45 +244,64 @@ export function createChat(currentUser, receivingUser) {
     chat.appendChild(status)
 
     messageBox.appendChild(chat);
-
 }
 
 function createTextArea(currentUser, receivingUser) {
-    const textArea = document.createElement("textarea")
-    textArea.id = "textBox"
+    const textArea = document.createElement("textarea");
+    textArea.id = "textBox";
     textArea.placeholder = `Send ${receivingUser} a message!`;
-    textArea.maxLength = "10000"
+    textArea.maxLength = "10000";
 
-    textArea.addEventListener('input', (e) => {
+    textArea.addEventListener("input", (e) => {
         const response = {
             currentUser: currentUser,
             receivingUser: receivingUser,
-        }
-        sendEvent("is_typing", response)
-    })
+        };
+        sendEvent("is_typing", response);
+    });
 
-    textArea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+    textArea.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey) {
             e.preventDefault();
-            limit++
-            sendMessage(textArea.value, currentUser, receivingUser) // send message to server
-            textArea.value = "";
-            return
+            limit++;
+            sendMessage(textArea.value, currentUser, receivingUser); // send message to server
         }
     });
-    return textArea
+
+    return textArea;
 }
 
 async function sendMessage(Message, Sender, Receiver) {
-    const request = {
-        Message: Message,
-        SenderName: Sender,
-        ReceiverName: Receiver,
-    }
-    sendEvent("send_message", request)
+    const chatArea = document.getElementById('chatLog')
+    const textArea = document.getElementById('textBox')
+    const message = Message.trimEnd().replace(/\\n/g, "<br>")
+    console.log(message,"<TO BE SENT")
+    if (message != "") {
+        const message = document.createElement("div");
+        message.id = "message";
 
-    loadMessage(Sender, Receiver, 1)
-    updateUserList(Sender, Receiver)
+        const currentDate = new Date();
+        const currentHour = currentDate.getHours();
+        const currentMinute = currentDate.getMinutes();
+
+            message.className = "messenger_currentUser";
+            message.innerHTML =
+                `<span class="dateColor">${currentHour}:${currentMinute}</span> ` +
+                `<span class="nameColor">${Sender}</span> <span class="separatorColor">:</span> ` +
+                `<span class="messageColor">${Message}</span>`;
+    
+        const chatMessage = {
+            Message: Message,
+            SenderName: Sender,
+            ReceiverName: Receiver,
+        };
+        sendEvent("send_message", chatMessage)
+        chatArea.appendChild(message)
+
+        textArea.value = "";
+        textArea.placeholder = `Send ${Receiver} a message!`
+    }
+    chatArea.scrollTop = chatArea.scrollHeight
 }
 
 const loadAdditionalMessages = (currentUser, receivingUser) => {

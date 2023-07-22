@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Event struct {
@@ -15,12 +16,6 @@ type Event struct {
 }
 
 type EventHandler func(event Event, c *Client) error
-
-type SendMessageEvent struct {
-	Message      string `json:"Message"`
-	SenderName   string `json:"SenderName"`
-	ReceiverName string `json:"ReceiverName"`
-}
 
 type SendActiveUsers struct {
 	Amount int `json:"amount"`
@@ -31,7 +26,7 @@ func (m *wsManager) setupEventHandlers() {
 	m.handlers[EventGetOnlineMembers] = GetOnlineMembersHandler
 	m.handlers[EventSendMessage] = SendMessageHandler
 	m.handlers[EventLoadMessages] = LoadMessagesHandler
-	m.handlers[EventOneMessage] = LoadOneMessageHandler
+	//m.handlers[EventOneMessage] = LoadOneMessageHandler
 	m.handlers[EventLoadPosts] = GetAllPosts
 	m.handlers[EventSortUsers] = SortUserList
 	m.handlers[EventIsTyping] = IsTypingHandler
@@ -127,6 +122,12 @@ type loadMessages struct {
 	Limit    int    `json:"limit"`
 }
 
+type SendMessageEvent struct {
+	Message      string `json:"Message"`
+	SenderName   string `json:"SenderName"`
+	ReceiverName string `json:"ReceiverName"`
+}
+
 const EventSortUsers = "update_users"
 
 func SortUserList(event Event, c *Client) error {
@@ -163,6 +164,18 @@ func SendMessageHandler(event Event, c *Client) error {
 
 	SaveChat(senderUserID, receivingUserID, sendMessage.Message)
 
+	var outgoing ReturnMessage
+	outgoing.MessageDate = time.Now().Format(time.RFC3339Nano)
+	outgoing.Message = sendMessage.Message
+	outgoing.ReceivingUser = sendMessage.ReceiverName
+	outgoing.UserName = sendMessage.SenderName
+
+
+	for client := range c.client.clients {
+		if client.userId == getUserId(sendMessage.ReceiverName) {
+			sendResponse(outgoing, "new_message", client)
+		}
+	}
 	return nil
 }
 
@@ -181,30 +194,6 @@ func LoadMessagesHandler(event Event, c *Client) error {
 		if client.userId == getUserId(loadMessage.Sender) {
 			responseData := LoadMessages(sql, getUserName(client.userId), loadMessage.Receiver, loadMessage.Limit)
 			sendResponse(responseData, EventLoadMessages, client)
-		}
-	}
-	return nil
-}
-
-const EventOneMessage = "load_message"
-
-func LoadOneMessageHandler(event Event, c *Client) error {
-
-	var loadMessage loadMessages
-
-	if err := json.Unmarshal(event.Payload, &loadMessage); err != nil {
-		return fmt.Errorf("bad payload in request: %v", err)
-	}
-	for client := range c.client.clients {
-		if client.userId == getUserId(loadMessage.Sender) || client.userId == getUserId(loadMessage.Receiver) {
-			receiverName := ""
-			if client.userId == getUserId(loadMessage.Sender) {
-				receiverName = loadMessage.Receiver
-			} else {
-				receiverName = loadMessage.Sender
-			}
-			responseData := LoadMessages(sql, getUserName(client.userId), receiverName, loadMessage.Limit)
-			sendResponse(responseData, EventOneMessage, client)
 		}
 	}
 	return nil
