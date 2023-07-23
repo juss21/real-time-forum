@@ -87,6 +87,7 @@
 }
 
 #chatLog {
+    height: 245px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
