@@ -10,7 +10,7 @@ export default function () {
     <br>
     <h1>Login page</h1>    
     <br>
-        <input type="text" placeholder="Username" name="login_id" id="login_id" value=""><br><br>
+        <input type="text" placeholder="Username or email" name="login_id" id="login_id" value=""><br><br>
         <input type="password" placeholder="Password" name="login_pw" id="login_pw" value=""><br>
         <br>
         <a id="ErrorBox"></a>
